@@ -1,11 +1,2002 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
+  <title>租房管理系统 · 权限管理版</title>
+  <!-- SortableJS 库：用于房源拖拽排序 -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <style>
+    * {
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-user-drag: none !important;
+      user-drag: none !important;
+    }
+    input, textarea, [contenteditable="true"] {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+      -webkit-touch-callout: none !important;
+    }
+    img, a, button, div, span, input, textarea {
+      -webkit-user-drag: none !important;
+      user-drag: none !important;
+    }
+    html { overflow-y: scroll; }
+    * {
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    }
+    body {
+      background:#F4F2EF;
+      color:#2E3B4E;
+      padding-bottom:30px;
+    }
+    .header {
+      background:#2F3E4F;
+      color:#FFFFFF;
+      padding:0 20px;
+      height:60px;
+      display:flex;
+      align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      position:sticky;
+      top:0;
+      z-index:10;
+      flex-wrap:nowrap;
+      gap:8px;
+    }
+    .header h2 {
+      font-size:18px;
+      font-weight:500;
+      white-space:nowrap;
+      flex-shrink:0;
+      color:#FFFFFF;
+    }
+    .nav {
+      display:flex;
+      height:100%;
+      flex-wrap:nowrap;
+      align-items:center;
+      gap:8px;
+      margin-left:auto;
+      flex:0 1 auto;
+    }
+    .nav-item {
+      height:100%;
+      display:flex;
+      align-items:center;
+      padding:0 24px;
+      cursor:pointer;
+      font-size:15px;
+      white-space:nowrap;
+      flex-shrink:1;
+      -webkit-tap-highlight-color:transparent;
+      outline:none;
+      transition:none!important;
+      color:#F0F0F0;
+    }
+    .nav-item.active {
+      background:rgba(255,255,255,0.15);
+    }
+    .nav-item:hover,.nav-item:active,.nav-item:focus {
+      outline:none!important;
+      box-shadow:none!important;
+      -webkit-tap-highlight-color:transparent!important;
+    }
+    @media (max-width:600px){
+      .header h2{font-size:16px}
+      .nav-item{padding:0 14px;font-size:14px}
+    }
+    .container {
+      max-width:1400px;
+      margin:24px auto;
+      padding:0 16px;
+    }
+    .toolbar { margin-bottom:24px; }
+    .toolbar-row {
+      display:flex;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .toolbar-row-buttons {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .toolbar-row-buttons .btn-group {
+      display: flex;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      gap: 12px;
+      justify-content: space-between;
+      width: 100%;
+      min-width: max-content;
+    }
+    .toolbar-row-buttons .btn-group .btn {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-group { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn {
+      padding:6px 12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:13px;
+      outline:none;
+      box-shadow:0 1px 4px rgba(0,0,0,0.05);
+      white-space:nowrap;
+      transition:none!important;
+      -webkit-tap-highlight-color:transparent!important;
+      display:inline-block;
+    }
+    .btn:hover,.btn:active,.btn:focus {
+      box-shadow:0 1px 4px rgba(0,0,0,0.05)!important;
+      transform:none!important;
+      outline:none!important;
+    }
+    .btn-primary { background:#5C6F87; color:#FFFFFF; }
+    .btn-success { background:#679A8B; color:#FFFFFF; }
+    .btn-warning { background:#D9925E; color:#FFFFFF;border: 1px solid #D9925E; }
+    .btn-danger  { background:#C76666; color:#FFFFFF; }
+    .btn-default { background:#FFFFFF; color:#2E3B4E; border:1px solid #D9D2C9; }
+    .btn:disabled {
+      opacity:0.5;
+      cursor:not-allowed!important;
+      pointer-events:none;
+      filter: grayscale(0.05);
+    }
+    .btn-circle {
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      background:#5C6F87;
+      color:white;
+      border:none;
+      font-size:24px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      padding:0;
+      line-height:1;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    }
+    .icon-btn {
+      background:none;
+      border:none;
+      font-size:20px;
+      cursor:pointer;
+      padding:4px 8px;
+      border-radius:8px;
+      color:#2E3B4E;
+    }
+    .filter-box { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .sort-box { display:flex; align-items:center; gap:4px; flex-wrap:nowrap; }
+    .sort-box label { display: none; }
+    .sort-box label { font-size:13px; color:#5F6B7A; white-space:nowrap; }
+    .modal {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(45,55,65,0.6);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      z-index:999;
+      will-change: transform;
+    }
+    .modal-content {
+      background:#FFFFFF;
+      width:90%;
+      max-width:420px;
+      border-radius:24px;
+      padding:28px;
+      max-height:90vh;
+      overflow-y:auto;
+      box-shadow:0 25px 50px -12px rgba(0,0,0,0.2);
+      will-change: transform, opacity;
+    }
+    .modal-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+      font-size:18px;
+      font-weight:600;
+      color:#2E3B4E;
+    }
+    .close {
+      font-size:28px;
+      cursor:pointer;
+      color:#A4A9B3;
+      padding:0 8px;
+      line-height:1;
+    }
+    .filter-option-group {
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      margin:16px 0 24px;
+    }
+    .filter-check-item {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:15px;
+      color:#2E3B4E;
+    }
+    .filter-check-item input[type="checkbox"],
+    .filter-check-item input[type="radio"] {
+      width:18px;
+      height:18px;
+      accent-color:#5C6F87;
+      cursor:pointer;
+    }
+    .filter-check-item input[type="checkbox"]:disabled {
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    .filter-check-item label { cursor:pointer; user-select:none; }
+    .card {
+      background:#FFFFFF;
+      border-radius:20px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.04);
+      padding:24px 22px;
+      overflow:hidden;
+    }
+    .table-box, .rent-table-wrapper, .history-tabs, #viewRoommatesContainer {
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+    }
+    #viewRoommatesContainer {
+      overflow-x: auto;
+    }
+    #tenantTable {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+    #tenantTable th,
+    #tenantTable td {
+      border-bottom: 1px solid #E2DCD2;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+      color: #2E3B4E;
+      background-color: #FFFFFF;
+    }
+    #tenantTable th {
+      background-color: #EDEAE4;
+      font-weight: 500;
+      color: #4E5A6B;
+    }
+    #tenantTable th:first-child,
+    #tenantTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background-color: #EDEAE4;
+      text-align: justify;
+      text-align-last: justify;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    #tenantTable td:first-child {
+      background-color: #FFFFFF;
+      z-index: 1;
+    }
+    #tenantTable th:first-child {
+      z-index: 3;
+    }
+    .table-box {
+      overflow-x: auto;
+      position: relative;
+    }
+    table { width:100%; border-collapse:collapse; }
+    th, td {
+      padding:12px 8px;
+      text-align:center;
+      border-bottom:1px solid #E2DCD2;
+      font-size:13px;
+      white-space:nowrap;
+      color:#2E3B4E;
+    }
+    .roommate-table {
+      width: 100%;
+      table-layout: auto;
+      border-collapse: collapse;
+    }
+    .roommate-table th,
+    .roommate-table td {
+      white-space: normal;
+      word-break: break-word;
+      text-align: left;
+      vertical-align: middle;
+      padding: 12px 10px;
+    }
+    .roommate-table th:first-child,
+    .roommate-table td:first-child {
+      width: 28%;
+      min-width: 110px;
+    }
+    .roommate-table th:nth-child(2),
+    .roommate-table td:nth-child(2) {
+      width: 22%;
+      min-width: 142px;
+    }
+    .roommate-table th:nth-child(3),
+    .roommate-table td:nth-child(3) {
+      width: 50%;
+      min-width: 190px;
+    }
+    .roommate-table input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #D9D2C9;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #FFFFFF;
+      box-sizing: border-box;
+      overflow-x: visible;
+      text-overflow: clip;
+    }
+    #roommateTableWrapper {
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+    #viewRoommatesContainer .roommate-table {
+      width: 100%;
+      table-layout: auto;
+    }
+    #viewRoommatesContainer .roommate-table td {
+      white-space: normal;
+      word-break: break-word;
+    }
+    #viewRoommatesContainer .roommate-table input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #F3F1EC;
+      border: 1px solid #E2DCD2;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+    textarea.auto-resize-textarea {
+      min-height: 90px;
+      line-height: 1.5;
+      resize: vertical;
+      overflow-y: auto;
+      transition: none;
+      box-sizing: border-box;
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #D9D2C9;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      background: #FFFFFF;
+    }
+    #viewRemark.auto-resize-textarea {
+      overflow-y: hidden !important;
+      resize: none !important;
+    }
+    textarea.auto-resize-textarea[readonly] {
+      background: #F3F1EC;
+    }
+    .house-table { table-layout:fixed; width:100%; }
+    .house-table th:first-child,.house-table td:first-child { width:30%; text-align:center; }
+    .house-table th:nth-child(2),.house-table td:nth-child(2) { width:45%; }
+    .house-table th:last-child,.house-table td:last-child { width:25%; }
+    .house-table td{padding: 12px 2px;}
+    th {
+      background:#EDEAE4;
+      font-weight:500;
+      color:#4E5A6B;
+    }
+    .tag {
+      padding:4px 10px;
+      border-radius:20px;
+      font-size:11px;
+      font-weight:500;
+      white-space:nowrap;
+      margin:0 4px 0 0;
+      display:inline-block;
+      box-shadow:0 1px 3px rgba(0,0,0,0.03);
+    }
+    .tag:last-child { margin-right:0; }
+    .tag-normal { background:#DFF0E8; color:#2B6C4C; }
+    .tag-book   { background:#FEF3D6; color:#A9692C; }
+    .tag-expire { background:#FDE4E1; color:#AB3E3E; }
+    .tag-early  { background:#EDE8E1; color:#685F55; }
+    .tag-house-free   { background:#DFF0E8; color:#2B6C4C; }
+    .tag-house-rented { background:#FDEDE1; color:#C95E2E; }
+    .tag-house-booked { background:#E1ECF9; color:#2C5F8A; }
+    .error-text { color:#C76666; font-weight:500; }
+    .history-tabs {
+      display:flex;
+      gap:8px;
+      margin:20px 0;
+      flex-wrap:nowrap;
+      padding-bottom:4px;
+    }
+    .history-tab {
+      padding:6px 14px;
+      background:#EDEAE4;
+      border-radius:30px;
+      cursor:pointer;
+      font-size:13px;
+      flex:0 0 auto;
+      border:1px solid transparent;
+      color:#2E3B4E;
+    }
+    .history-tab.active {
+      background:#5C6F87;
+      color:white;
+      border-color:#5C6F87;
+      box-shadow:0 4px 8px rgba(92,111,135,0.25);
+    }
+    .page { display:none; }
+    .page.active { display:block; }
+    .page-card { max-width:900px; margin:0 auto; }
+    .back-btn { margin-bottom:20px; }
+    .form-item { margin-bottom:20px; }
+    .form-item-row { display:flex; align-items:center; gap:16px; flex-wrap:nowrap; }
+    .form-item-row label {
+      width:34%;
+      font-size:14px;
+      color:#5F6B7A;
+      font-weight:500;
+      flex-shrink:0;
+    }
+    .form-item-row input, .form-item-row select, .form-item-row textarea {
+      flex:1 1 0;
+      min-width:0;
+      width:100%;
+      padding:8px 12px;
+      border:1px solid #D9D2C9;
+      border-radius:8px;
+      font-size:14px;
+      background:#FFFFFF;
+      color:#2E3B4E;
+    }
+    .form-item-row textarea { resize:none; min-height:80px; font-family:inherit; }
+    .double-select-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:nowrap;
+      margin-bottom:20px;
+    }
+    .double-select-item { flex:1; min-width:0; }
+    .double-select-item label {
+      display:block;
+      margin-bottom:4px;
+      font-size:13px;
+      color:#5F6B7A;
+    }
+    .select-button {
+      display:block;
+      width:100%;
+      padding:8px 12px;
+      border:1px solid #D9D2C9;
+      border-radius:8px;
+      background:#FFFFFF;
+      cursor:pointer;
+      font-size:14px;
+      color:#2E3B4E;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .select-button:hover {
+      border-color:#5C6F87;
+      background:#F9F8F5;
+    }
+    .select-button.input-error {
+      border-color: #C76666 !important;
+      background-color: #FCF2F0 !important;
+    }
+    .key-row {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:nowrap;
+      margin-bottom:20px;
+    }
+    .key-row label {
+      width:34%;
+      font-size:14px;
+      color:#5F6B7A;
+      font-weight:500;
+      flex-shrink:0;
+    }
+    .key-row .key-count-select { flex:1; min-width:0; }
+    .key-row .key-status-select { flex:1; min-width:0; }
+    .deposit-row {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .deposit-row label {
+      width:34%;
+      font-size:14px;
+      color:#5F6B7A;
+      font-weight:500;
+      flex-shrink:0;
+    }
+    .deposit-row .deposit-input { flex: 2 1 0; }
+    .deposit-row .deposit-status { flex: 1 1 0; min-width: 80px; }
+    .deposit-row .deposit-input input,
+    .deposit-row .deposit-status .select-button {
+      width:100%;
+      padding:8px 12px;
+      border:1px solid #D9D2C9;
+      border-radius:8px;
+      font-size:14px;
+      background:#FFFFFF;
+      color:#2E3B4E;
+    }
+    .form-item input:read-only, .form-item select:read-only, .form-item select:disabled, .form-item textarea:read-only {
+      background:#F3F1EC;
+      color:#5F6B7A;
+      cursor:not-allowed;
+    }
+    .form-footer { margin-top:28px; display:flex; justify-content:flex-end; gap:12px; flex-wrap:wrap; }
+    .form-footer.center { justify-content:center; }
+    .section-title {
+      font-size:16px;
+      font-weight:600;
+      margin:24px 0 16px;
+      color:#2E3B4E;
+      text-align:left;
+    }
+    .rent-table { min-width:400px; width:100%; }
+    .rent-table input {
+      width:100%;
+      min-width:90px;
+      padding:5px 8px;
+      border:1px solid #D9D2C9;
+      border-radius:6px;
+      font-size:13px;
+      color:#2E3B4E;
+    }
+    .rent-table input:read-only { background:#F3F1EC; }
+    .table-btn-group { display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
+    .empty-state {
+      text-align:center;
+      padding:20px;
+      background:#F3F1EC;
+      border-radius:16px;
+      color:#8E959F;
+      font-size:15px;
+    }
+    .action-group { display:flex; gap:6px; justify-content:center; flex-wrap:nowrap; }
+    .roommate-actions { white-space:nowrap; }
+    .status-container { display:flex; flex-wrap:nowrap; gap:4px; align-items:center; justify-content:center; }
+    #tenantList td:first-child {
+      text-align:justify;
+      text-justify:inter-ideograph;
+      padding-left:16px;
+      padding-right:16px;
+      padding: 8px 15px;
+      text-align: justify;
+      text-align-last: justify;
+      word-spacing: calc((100% - 2em) / 2);
+      -moz-text-align-last: justify;
+      -webkit-text-align-last: justify;
+    }
+    * { -webkit-tap-highlight-color:transparent!important; outline:none!important; }
+    .modal .form-item { margin-bottom:20px; }
+    .modal .form-item-row { display:block; align-items:center; gap:16px; flex-wrap:nowrap; }
+    .modal .form-item-row label { width:120px; min-width:120px; margin-bottom:20px; display:block; color:#5F6B7A; }
+    .modal .form-item-row input { flex:1; padding:8px 12px; border:1px solid #D9D2C9; border-radius:8px; font-size:14px; }
+    .btn-sm { padding:4px 8px; font-size:12px; }
+    .hidden { display: none !important; }
+    .btn-active { background:#5C6F87; color:#fff; border-color:#5C6F87; }
+    .input-error { border-color: #C76666 !important; background-color: #FCF2F0; }
+    .error-hint { color: #C76666; font-size: 12px; margin-top: 4px; visibility: hidden; }
+    #electricTable input[readonly], #editElectricTable input[readonly] { background:#F3F1EC; }
+    .btn-default.btn-primary { background:#5C6F87; border-color:#5C6F87; color:#fff; }
+    .btn-default.btn-primary:hover { background:#5C6F87; }
+    .permission-desc {
+      background:#F4F2EF;
+      padding:12px;
+      border-radius:12px;
+      margin:8px 0 4px;
+      font-size:13px;
+      color:#5F6B7A;
+      line-height:1.5;
+    }
+    .sortable-item {
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative;
+      z-index: 1;
+    }
+    .sortable-item:active {
+      cursor: grabbing;
+    }
+    .sortable-ghost-hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      transform: scale(0.98);
+    }
+    .sortable-drag-custom {
+      transform: scale(1.02) !important;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2) !important;
+      background-color: #fff !important;
+      z-index: 9999 !important;
+      transition: transform 0.12s ease !important;
+      opacity: 0.98;
+    }
+    .sortable-fallback-custom {
+      transform: scale(1.02) rotate(0.5deg);
+      box-shadow: 0 20px 32px rgba(0,0,0,0.25);
+      background: white;
+      border-radius: 12px;
+      opacity: 0.95;
+      z-index: 10000;
+    }
+    .delete-house-error {
+      color: #C76666;
+      font-size: 13px;
+      margin-top: 12px;
+      margin-bottom: 8px;
+      padding: 12px 12px;
+      background: #FEF2F0;
+      border-radius: 12px;
+      text-align: center;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      visibility: hidden;
+      line-height: 1.4;
+    }
+    .delete-house-error.visible {
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h2>租房管理系统</h2>
+  <div class="nav">
+    <div class="nav-item active" data-page="tenant">租客列表</div>
+    <div class="nav-item" data-page="house">房源列表</div>
+  </div>
+</div>
+
+<div class="container">
+<!-- 租客列表 -->
+<div class="page active" id="tenant">
+  <div class="toolbar">
+    <div class="toolbar-row toolbar-row-buttons">
+      <div class="btn-group" style="flex-wrap: nowrap;">
+        <button class="btn btn-default" id="mergeSettingsBtn">合并</button>
+        <button class="btn btn-default" id="permissionBtn">权限</button>
+        <button class="btn btn-primary" id="exportBtn">备份</button>
+        <button class="btn btn-success" id="importBtn">恢复</button>
+        <button class="btn btn-primary" id="addTenantBtn">添加</button>
+      </div>
+    </div>
+    <div class="toolbar-row" style="display:flex; justify-content:flex-end; align-items:center; gap:12px;">
+      <button class="btn btn-default btn-sm" id="sortBtn" onclick="showSortModal()" style="padding:6px 12px;">选择排序</button>
+      <button class="btn btn-default" id="filterStatusBtn" onclick="showFilterModal()">筛选状态</button>
+      <button class="btn btn-default" onclick="resetFilter()">重置</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-box" id="tenantTableBox">
+      <table id="tenantTable">
+        <thead> <th>姓名</th><th>房间号</th><th>剩余天数</th><th>租客状态</th><th>房间状态</th><th>操作</th> </thead>
+        <tbody id="tenantList"></tbody>
+      </table>
+      <div id="tenantEmpty" class="empty-state" style="display:none;"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="无数据"><div>暂无租客数据</div></div>
+    </div>
+  </div>
+</div>
+<!-- 房源列表 -->
+<div class="page" id="house">
+  <div class="toolbar">
+    <div class="toolbar-row">
+      <div class="batch-toolbar" style="margin-left:auto;">
+        <button class="btn btn-primary" onclick="showAddHouseModal()">添加</button>
+        <button class="btn btn-danger" onclick="batchDelete()">删除</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-box">
+      <table class="house-table" id="houseTable">
+        <thead><th>房间号</th><th>状态</th><th>操作</th> </thead>
+        <tbody id="houseList"></tbody>
+      </table>
+      <div id="houseEmpty" class="empty-state" style="display:none;"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M19 9H5c-1.1 0-2 .9-2 2v8h18v-8c0-1.1-.9-2-2-2zm0 2v2h-5v-2h5zm-7 0v2H6v-2h6zm-6 4h6v2H6v-2zm10 2h-4v-2h4v2zM5 3h14v4H5z'/%3E%3C/svg%3E" alt="无数据"><div>暂无房源数据</div></div>
+    </div>
+  </div>
+</div>
+<!-- 弹窗集合 -->
+<div class="modal" id="addHouseModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">新增房源</div><div class="close" onclick="closeAddHouseModal()">×</div></div><div class="form-item"><div class="form-item-row"><label>房间号</label><input type="text" id="newHouseRoom" placeholder="例如 105" oninput="validateHouseRoom()" required></div><div class="error-hint" id="houseRoomError">房间号不能为空或已存在</div></div><div class="form-footer"><button class="btn btn-primary" onclick="addHouse()">确定</button><button class="btn btn-default" onclick="closeAddHouseModal()">取消</button></div></div></div>
+<div class="modal" id="mergeModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">租客合并设置</div><div class="close" onclick="closeMergeModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="checkbox" id="enableMergeCheckbox"> <label for="enableMergeCheckbox">启用按身份证合并</label></div><div class="permission-desc">📌 开启后，相同身份证号的租客只显示最新入住的一条记录，便于查看当前有效租约。关闭后则显示所有历史租客记录。</div></div><div class="form-footer"><button class="btn btn-primary" onclick="saveMergeSetting()">确定</button><button class="btn btn-default" onclick="closeMergeModal()">取消</button></div></div></div>
+<div class="modal" id="permissionModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">租客操作权限管理</div><div class="close" onclick="closePermissionModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="checkbox" id="enablePermissionCheckbox"> <label for="enablePermissionCheckbox">启用租客操作权限限制</label></div><div class="permission-desc">📌 开启后，租客列表的编辑/删除按钮将根据状态自动限制：<br> • 正常 → <strong>禁用删除</strong>（可编辑）<br> • 到期 / 提前退租 → <strong>禁用编辑+删除</strong><br> • 已预约 → 全部可操作<br> 🔘 关闭后所有租客的编辑/删除按钮恢复正常。</div></div><div class="form-footer"><button class="btn btn-primary" onclick="savePermissionSetting()">确定</button><button class="btn btn-default" onclick="closePermissionModal()">取消</button></div></div></div>
+<div class="modal" id="messageModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">提示</div><div class="close" onclick="closeMessageModal()">×</div></div><p id="messageText" style="margin:20px 0; font-size:15px;"></p><div class="form-footer"><button class="btn btn-primary" onclick="closeMessageModal()">确定</button></div></div></div>
+<div class="modal" id="deleteHouseModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">删除房源</div><div class="close" onclick="closeDeleteHouseModal()">×</div></div><div id="deleteHouseList" style="max-height: 400px; overflow-y: auto; margin-bottom: 8px;"></div><div id="deleteHouseErrorMsg" class="delete-house-error"></div><div class="form-footer"><button class="btn btn-danger" id="confirmDeleteHousesBtn">确认删除</button><button class="btn btn-default" onclick="closeDeleteHouseModal()">取消</button></div></div></div>
+<div class="modal" id="confirmModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">删除确认</div><div class="close" onclick="closeConfirm()">×</div></div><p style="margin:20px 0; font-size:15px;">确定删除该租客？删除后房间恢复可租</p><div class="form-footer"><button class="btn btn-default" onclick="closeConfirm()">取消</button><button class="btn btn-danger" onclick="realDelete()">确认删除</button></div></div></div>
+<div class="modal" id="filterModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">筛选租客状态</div><div class="close" onclick="closeFilterModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="checkbox" id="filterNormal" value="正常" onchange="updateFilterButtons()"><label for="filterNormal">正常</label></div><div class="filter-check-item"><input type="checkbox" id="filterBooked" value="已预约" onchange="updateFilterButtons()"><label for="filterBooked">已预约</label></div><div class="filter-check-item"><input type="checkbox" id="filterExpire" value="到期" onchange="updateFilterButtons()"><label for="filterExpire">到期</label></div><div class="filter-check-item"><input type="checkbox" id="filterEarly" value="提前退租" onchange="updateFilterButtons()"><label for="filterEarly">提前退租</label></div></div><div class="form-footer" id="filterModalFooter"><button class="btn btn-primary" id="filterConfirmBtn" onclick="applyFilter()" style="display:none;">确定</button><button class="btn btn-default" onclick="closeFilterModal()">取消</button></div></div></div>
+<div class="modal" id="sortModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择排序方式</div><div class="close" onclick="closeSortModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="sortRule" id="sortCreateDesc" value="createTimeDesc"><label for="sortCreateDesc">最新添加</label></div><div class="filter-check-item"><input type="radio" name="sortRule" id="sortStartAsc" value="startDateAsc"><label for="sortStartAsc">入住日期（早 → 晚）</label></div><div class="filter-check-item"><input type="radio" name="sortRule" id="sortLeftAsc" value="leftDaysAsc"><label for="sortLeftAsc">剩余天数（少 → 多）</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applySort()">确定</button><button class="btn btn-default" onclick="closeSortModal()">取消</button></div></div></div>
+<div class="modal" id="roomSelectModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择房间</div><div class="close" onclick="closeRoomSelectModal()">×</div></div><div class="filter-option-group" id="roomListContainer"></div><div class="form-footer"><button class="btn btn-primary" onclick="applyRoomSelect()">确定</button><button class="btn btn-default" onclick="closeRoomSelectModal()">取消</button></div></div></div>
+<div class="modal" id="depositStatusModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择押金状态</div><div class="close" onclick="closeDepositStatusModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="depositRadio" id="depositUnpaid" value="未支付"><label for="depositUnpaid">未支付</label></div><div class="filter-check-item"><input type="radio" name="depositRadio" id="depositPaid" value="已支付"><label for="depositPaid">已支付</label></div><div class="filter-check-item"><input type="radio" name="depositRadio" id="depositReturned" value="已退回"><label for="depositReturned">已退回</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyDepositStatus()">确定</button><button class="btn btn-default" onclick="closeDepositStatusModal()">取消</button></div></div></div>
+<div class="modal" id="keyStatusModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择钥匙状态</div><div class="close" onclick="closeKeyStatusModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="keyRadio" id="keyPending" value="待交接"><label for="keyPending">待交接</label></div><div class="filter-check-item"><input type="radio" name="keyRadio" id="keyTransferred" value="已转交"><label for="keyTransferred">已转交</label></div><div class="filter-check-item"><input type="radio" name="keyRadio" id="keyNotReturned" value="未归还"><label for="keyNotReturned">未归还</label></div><div class="filter-check-item"><input type="radio" name="keyRadio" id="keyReturned" value="已归还"><label for="keyReturned">已归还</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyKeyStatus()">确定</button><button class="btn btn-default" onclick="closeKeyStatusModal()">取消</button></div></div></div>
+<div class="modal" id="keyCountModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择钥匙数量</div><div class="close" onclick="closeKeyCountModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="keyCountRadio" id="keyCount1" value="1"><label for="keyCount1">1</label></div><div class="filter-check-item"><input type="radio" name="keyCountRadio" id="keyCount2" value="2"><label for="keyCount2">2</label></div><div class="filter-check-item"><input type="radio" name="keyCountRadio" id="keyCount3" value="3"><label for="keyCount3">3</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyKeyCount()">确定</button><button class="btn btn-default" onclick="closeKeyCountModal()">取消</button></div></div></div>
+<div class="modal" id="tenantStatusModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择租客状态</div><div class="close" onclick="closeTenantStatusModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="tenantStatusRadio" id="tenantNormal" value="正常"><label for="tenantNormal">正常</label></div><div class="filter-check-item"><input type="radio" name="tenantStatusRadio" id="tenantBooked" value="已预约"><label for="tenantBooked">已预约</label></div><div class="filter-check-item"><input type="radio" name="tenantStatusRadio" id="tenantEarly" value="提前退租"><label for="tenantEarly">提前退租</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyTenantStatus()">确定</button><button class="btn btn-default" onclick="closeTenantStatusModal()">取消</button></div></div></div>
+<div class="modal" id="contractStatusModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择合同状态</div><div class="close" onclick="closeContractStatusModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="contractRadio" id="contractUnsigned" value="未签"><label for="contractUnsigned">未签</label></div><div class="filter-check-item"><input type="radio" name="contractRadio" id="contractSigned" value="已签"><label for="contractSigned">已签</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyContractStatus()">确定</button><button class="btn btn-default" onclick="closeContractStatusModal()">取消</button></div></div></div>
+<div class="modal" id="payPeriodModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择支付周期</div><div class="close" onclick="closePayPeriodModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="payPeriodRadio" id="periodMonth" value="月付"><label for="periodMonth">月付</label></div><div class="filter-check-item"><input type="radio" name="payPeriodRadio" id="periodQuarter" value="季付"><label for="periodQuarter">季付</label></div><div class="filter-check-item"><input type="radio" name="payPeriodRadio" id="periodHalfYear" value="半年付"><label for="periodHalfYear">半年付</label></div><div class="filter-check-item"><input type="radio" name="payPeriodRadio" id="periodYear" value="年付"><label for="periodYear">年付</label></div><div class="filter-check-item"><input type="radio" name="payPeriodRadio" id="periodFull" value="一次全付"><label for="periodFull">一次全付</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyPayPeriod()">确定</button><button class="btn btn-default" onclick="closePayPeriodModal()">取消</button></div></div></div>
+<div class="modal" id="payChannelModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">选择支付渠道</div><div class="close" onclick="closePayChannelModal()">×</div></div><div class="filter-option-group"><div class="filter-check-item"><input type="radio" name="payChannelRadio" id="channelWechat" value="微信"><label for="channelWechat">微信</label></div><div class="filter-check-item"><input type="radio" name="payChannelRadio" id="channelAlipay" value="支付宝"><label for="channelAlipay">支付宝</label></div><div class="filter-check-item"><input type="radio" name="payChannelRadio" id="channelBank" value="银行卡转账"><label for="channelBank">银行卡转账</label></div><div class="filter-check-item"><input type="radio" name="payChannelRadio" id="channelCash" value="现金"><label for="channelCash">现金</label></div></div><div class="form-footer"><button class="btn btn-primary" onclick="applyPayChannel()">确定</button><button class="btn btn-default" onclick="closePayChannelModal()">取消</button></div></div></div>
+<div class="modal" id="sortHouseModal"><div class="modal-content"><div class="modal-header"><div class="modal-title">排序房源</div><div class="close" onclick="closeSortHouseModal()">×</div></div><div class="filter-option-group"><div id="sortableRoomList" class="sortable-list" style="list-style:none; padding:0; margin:0;"></div></div><div class="form-footer"><button class="btn btn-primary" onclick="saveHouseOrder()">保存</button><button class="btn btn-default" onclick="closeSortHouseModal()">取消</button></div></div></div>
+
+<!-- 添加租客页面 -->
+<div class="page" id="addTenantPage">
+  <div class="card page-card"><button class="btn btn-default back-btn" onclick="clearAddFormErrorsAndBack()">← 返回列表</button><h2 style="margin-bottom:20px">添加租客</h2>
+    <div class="section-title">租户信息</div>
+    <div class="form-item"><div class="form-item-row"><label>租户姓名</label><input type="text" id="addName" placeholder="请输入姓名" required></div></div>
+    <div class="form-item"><div class="form-item-row"><label>手机号码</label><input type="tel" inputmode="numeric" id="addPhone" oninput="filterPhoneInput(this); checkAddPhone()" placeholder="请输入11位手机号码" maxlength="11" required></div></div>
+    <div class="form-item"><div class="form-item-row"><label>身份证号码</label><input type="text" inputmode="numeric" id="addIdCard" oninput="filterIdCardInput(this); checkAddIdCard()" placeholder="请输入18位身份证号码" maxlength="18" required></div></div>
+    <div class="section-title">房间信息</div>
+    <div class="form-item"><div class="form-item-row"><label>房间号</label><div class="select-button" onclick="showRoomSelectModal('add')" id="addRoomDisplay">—— 请选择房间 ——</div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>月租金</label><input type="number" id="monthRent" placeholder="请输入月租金" required></div></div>
+    <div class="deposit-row"><label for="deposit">押金金额</label><div class="deposit-input"><input type="number" id="deposit" placeholder="" required></div><div class="deposit-status"><div class="select-button" onclick="showDepositStatusModal('add')" id="depositStatus">未支付</div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>房间状态</label><input type="text" id="roomStatus" readonly placeholder="自动显示"></div></div>
+    <div class="section-title">租住时间</div>
+    <div class="form-item"><div class="form-item-row"><label>入住日期</label><input type="date" id="startDate" onchange="calcRentInfo()"></div></div>
+    <div class="form-item"><div class="form-item-row"><label>到期日期</label><input type="date" id="addExpireDate" onchange="calcRentInfo()"></div></div>
+    <div class="form-item"><div class="form-item-row"><label>租住月数</label><input type="text" id="rentMonths" readonly placeholder="自动计算"></div></div>
+    <div class="form-item"><div class="form-item-row"><label>剩余天数</label><input type="text" id="leftDays" readonly placeholder="自动计算"></div></div>
+    <div class="section-title">支付方式</div>
+    <div class="form-item"><div class="form-item-row"><label>支付周期</label><div class="select-button" onclick="showPayPeriodModal('add')" id="addPayPeriodDisplay">月付</div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>支付渠道</label><div class="select-button" onclick="showPayChannelModal('add')" id="addPayChannelDisplay">微信</div></div></div>
+    <div class="section-title">钥匙情况</div>
+    <div class="key-row"><label>钥匙</label><div class="key-count-select" style="flex:1; min-width:0;"><div class="select-button" onclick="showKeyCountModal('add')" id="keyCountSelect">1</div></div><div class="key-status-select"><div class="select-button" onclick="showKeyStatusModal('add')" id="keyStatusSelect">待交接</div></div></div>
+
+    <!-- 合租室友区域 -->
+    <div class="section-title">合租室友</div>
+    <div id="roommateTableWrapper" style="display: none; overflow-x: auto; margin-bottom: 12px;">
+      <table class="roommate-table" id="addRoommateTable">
+        <thead><th>姓名</th><th>手机号码</th><th>身份证号码</th></thead>
+        <tbody id="addRoommatesTbody"></tbody>
+      </table>
+    </div>
+    <div class="table-btn-group" style="margin-top: 0;">
+      <button class="btn btn-success" id="showAddRoommateBtn">+ 添加室友</button>
+      <button class="btn btn-danger" id="deleteLastRoommateBtn" style="display: none;">删除</button>
+    </div>
+
+    <!-- 房租缴费记录 -->
+    <div class="section-title">房租缴费记录</div>
+    <div id="rentTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="rentTable">
+        <thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="table-btn-group">
+      <button class="btn btn-success" id="addRentBtn">增加</button>
+      <button class="btn btn-danger" id="delRentBtn" style="display: none;">删除</button>
+    </div>
+
+    <!-- 电费缴费记录 -->
+    <div class="section-title">电费缴费记录</div>
+    <div id="elecPayTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="elecPayTable">
+        <thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="table-btn-group">
+      <button class="btn btn-success" id="addElecPayBtn">增加</button>
+      <button class="btn btn-danger" id="delElecPayBtn" style="display: none;">删除</button>
+    </div>
+
+    <!-- 电表数据 -->
+    <div class="section-title">电表数据</div>
+    <div id="electricTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="electricTable">
+        <thead><th>记录日期</th><th>电表数</th><th>用电金额（元）</th></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="table-btn-group">
+      <button class="btn btn-success" id="addElectricBtn">增加</button>
+      <button class="btn btn-danger" id="delElectricBtn" style="display: none;">删除</button>
+    </div>
+
+    <!-- 其他费用记录 -->
+    <div class="section-title">其他费用记录</div>
+    <div id="otherTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="otherTable">
+        <thead><th>支付时间</th><th>支付金额（元）</th><th>费用备注</th></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="table-btn-group">
+      <button class="btn btn-success" id="addOtherBtn">增加</button>
+      <button class="btn btn-danger" id="delOtherBtn" style="display: none;">删除</button>
+    </div>
+
+    <div class="section-title">租客备注</div>
+    <div class="form-item"><div class="form-item-row" style="display:block"><textarea id="tenantRemark" class="auto-resize-textarea" placeholder="可记录：租金约定、押金水电费及其他注意事项"></textarea></div></div>
+    <div class="section-title">状态</div>
+    <div class="double-select-row"><div class="double-select-item" style="display:flex; flex-direction:column; gap:4px;"><label>租客状态</label><div class="select-button" onclick="showTenantStatusModal('add')" id="addStatus">正常</div></div><div class="double-select-item" style="display:flex; flex-direction:column; gap:4px;"><label>合同状态</label><div class="select-button" onclick="showContractStatusModal('add')" id="addContractStatus">未签</div></div></div>
+    <div class="form-footer"><button type="button" class="btn btn-primary" onclick="saveAddTenant()">保存</button><button type="button" class="btn btn-default" onclick="clearAddFormErrorsAndBack()">关闭</button></div>
+  </div>
+</div>
+<!-- 查看租客页面 -->
+<div class="page" id="viewTenantPage">
+  <div class="card page-card"><button class="btn btn-default back-btn" onclick="goBack()">← 返回列表</button><h2 style="margin-bottom:20px">租客详情</h2>
+    <div class="history-tabs" id="historyTabs" style="display:none;"></div>
+    <div class="section-title">租户信息</div>
+    <div class="form-item"><div class="form-item-row"><label>租户姓名</label><input type="text" id="viewName" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>手机号码</label><input type="text" id="viewPhone" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>身份证号码</label><input type="text" id="viewIdCard" readonly></div></div>
+    <div class="section-title">房间信息</div>
+    <div class="form-item"><div class="form-item-row"><label>房间号</label><input type="text" id="viewRoom" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>月租金</label><input type="number" id="viewMonthRent" readonly></div></div>
+    <div class="deposit-row"><label for="viewDeposit">押金金额</label><div class="deposit-input"><input type="number" id="viewDeposit" readonly></div><div class="deposit-status"><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewDepositStatus"></div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>房间状态</label><input type="text" id="viewRoomStatus" readonly></div></div>
+    <div class="section-title">租住时间</div>
+    <div class="form-item"><div class="form-item-row"><label>入住日期</label><input type="date" id="viewStartDate" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>到期日期</label><input type="date" id="viewExpireDate" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>租住月数</label><input type="text" id="viewRentMonths" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>剩余天数</label><input type="text" id="viewLeftDays" readonly></div></div>
+    <div class="section-title">支付方式</div>
+    <div class="form-item"><div class="form-item-row"><label>支付周期</label><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewPayPeriod"></div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>支付渠道</label><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewPayChannel"></div></div></div>
+    <div class="section-title">钥匙情况</div>
+    <div class="key-row"><label>钥匙</label><div class="key-count-select"><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewKeyCount"></div></div><div class="key-status-select"><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewKeyStatus"></div></div></div>
+
+    <!-- 合租室友 -->
+    <div class="section-title">合租室友</div>
+    <div id="viewRoommatesContainer"></div>
+
+    <!-- 房租缴费记录 -->
+    <div class="section-title">房租缴费记录</div>
+    <div id="viewRentTableWrapper" class="rent-table-wrapper">
+      <table class="rent-table" id="viewRentTable"><thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead><tbody></tbody></table>
+      <div id="viewRentEmpty" class="empty-state" style="display: none;">暂无缴费记录</div>
+    </div>
+
+    <!-- 电费缴费记录 -->
+    <div class="section-title">电费缴费记录</div>
+    <div id="viewElecPayTableWrapper" class="rent-table-wrapper">
+      <table class="rent-table" id="viewElecPayTable"><thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead><tbody></tbody></table>
+      <div id="viewElecPayEmpty" class="empty-state" style="display: none;">暂无缴费记录</div>
+    </div>
+
+    <!-- 电表数据 -->
+    <div class="section-title">电表数据</div>
+    <div id="viewElectricTableWrapper" class="rent-table-wrapper">
+      <table class="rent-table" id="viewElectricTable"><thead><th>记录日期</th><th>电表数</th><th>用电金额（元）</th></thead><tbody></tbody></table>
+      <div id="viewElectricEmpty" class="empty-state" style="display: none;">暂无电表数据</div>
+    </div>
+
+    <!-- 其他费用记录 -->
+    <div class="section-title">其他费用记录</div>
+    <div id="viewOtherTableWrapper" class="rent-table-wrapper">
+      <table class="rent-table" id="viewOtherTable"><thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead><tbody></tbody></table>
+      <div id="viewOtherEmpty" class="empty-state" style="display: none;">暂无费用记录</div>
+    </div>
+
+    <!-- 租客备注 -->
+    <div class="section-title">租客备注</div>
+    <div id="viewRemarkWrapper">
+      <textarea id="viewRemark" class="auto-resize-textarea" readonly style="width:100%; min-height:90px; background:#F3F1EC;"></textarea>
+      <div id="viewRemarkEmpty" class="empty-state" style="display: none;">暂无备注</div>
+    </div>
+
+    <div class="section-title">状态</div>
+    <div class="double-select-row" style="margin-bottom:20px;">
+      <div class="double-select-item"><label>租客状态</label><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewStatus"></div></div>
+      <div class="double-select-item"><label>合同状态</label><div class="select-button" style="background:#f5f7fa; cursor:default;" id="viewContractStatus"></div></div>
+    </div>
+    <div class="form-footer center"><button class="btn btn-primary" onclick="goBack()">返回列表</button></div>
+  </div>
+</div>
+
+<!-- 编辑租客页面 -->
+<div class="page" id="editTenantPage">
+  <div class="card page-card"><button class="btn btn-default back-btn" onclick="goBack()">← 返回列表</button><h2 style="margin-bottom:20px">编辑租客</h2>
+    <div class="section-title">租户信息</div>
+    <div class="form-item"><div class="form-item-row"><label>租户姓名</label><input type="text" id="editName" required></div></div>
+    <div class="form-item"><div class="form-item-row"><label>手机号码</label><input type="tel" inputmode="numeric" id="editPhone" oninput="filterPhoneInput(this); checkEditPhone()" maxlength="11" required></div></div>
+    <div class="form-item"><div class="form-item-row"><label>身份证号码</label><input type="text" inputmode="numeric" id="editIdCard" oninput="filterIdCardInput(this); checkEditIdCard()" maxlength="18" required></div></div>
+    <div class="section-title">房间信息</div>
+    <div class="form-item"><div class="form-item-row"><label>房间号</label><div class="select-button" onclick="showRoomSelectModal('edit')" id="editRoomDisplay">—— 请选择房间 ——</div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>月租金</label><input type="number" id="editMonthRent" required></div></div>
+    <div class="deposit-row"><label for="editDeposit">押金金额</label><div class="deposit-input"><input type="number" id="editDeposit" required></div><div class="deposit-status"><div class="select-button" onclick="showDepositStatusModal('edit')" id="editDepositStatus">未支付</div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>房间状态</label><input type="text" id="editRoomStatus" readonly></div></div>
+    <div class="section-title">租住时间</div>
+    <div class="form-item"><div class="form-item-row"><label>入住日期</label><input type="date" id="editStartDate" onchange="editCalcRentInfo()" required></div></div>
+    <div class="form-item"><div class="form-item-row"><label>到期日期</label><input type="date" id="editExpireDate" onchange="editCalcRentInfo()" required></div></div>
+    <div class="form-item"><div class="form-item-row"><label>租住月数</label><input type="text" id="editRentMonths" readonly></div></div>
+    <div class="form-item"><div class="form-item-row"><label>剩余天数</label><input type="text" id="editLeftDays" readonly></div></div>
+    <div class="section-title">支付方式</div>
+    <div class="form-item"><div class="form-item-row"><label>支付周期</label><div class="select-button" onclick="showPayPeriodModal('edit')" id="editPayPeriodDisplay">月付</div></div></div>
+    <div class="form-item"><div class="form-item-row"><label>支付渠道</label><div class="select-button" onclick="showPayChannelModal('edit')" id="editPayChannelDisplay">微信</div></div></div>
+    <div class="section-title">钥匙情况</div>
+    <div class="key-row"><label>钥匙</label><div class="key-count-select" style="flex:1; min-width:0;"><div class="select-button" onclick="showKeyCountModal('edit')" id="editKeyCountSelect">1</div></div><div class="key-status-select"><div class="select-button" onclick="showKeyStatusModal('edit')" id="editKeyStatusSelect">待交接</div></div></div>
+
+    <!-- 合租室友区域 -->
+    <div class="section-title">合租室友</div>
+    <div id="editRoommateWrapper" style="overflow-x: auto; margin-bottom: 12px; display: none;">
+      <table class="roommate-table" id="editRoommateTable"><thead><th>姓名</th><th>手机号码</th><th>身份证号码</th></thead><tbody id="editRoommatesTbody"></tbody></table>
+    </div>
+    <div class="table-btn-group">
+      <button class="btn btn-success" id="editAddRoommateBtn">+ 添加室友</button>
+      <button class="btn btn-danger" id="editDeleteRoommateBtn" style="display: none;">删除</button>
+    </div>
+
+    <!-- 房租缴费记录 -->
+    <div class="section-title">房租缴费记录</div>
+    <div id="editRentTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="editRentTable"><thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead><tbody></tbody></table>
+    </div>
+    <div class="table-btn-group"><button class="btn btn-success" id="editAddRentBtn">增加</button><button class="btn btn-danger" id="editDelRentBtn" style="display: none;">删除</button></div>
+
+    <!-- 电费缴费记录 -->
+    <div class="section-title">电费缴费记录</div>
+    <div id="editElecPayTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="editElecPayTable"><thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead><tbody></tbody></table>
+    </div>
+    <div class="table-btn-group"><button class="btn btn-success" id="editAddElecPayBtn">增加</button><button class="btn btn-danger" id="editDelElecPayBtn" style="display: none;">删除</button></div>
+
+    <!-- 电表数据 -->
+    <div class="section-title">电表数据</div>
+    <div id="editElectricTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="editElectricTable"><thead><th>记录日期</th><th>电表数</th><th>用电金额（元）</th></thead><tbody></tbody></table>
+    </div>
+    <div class="table-btn-group"><button class="btn btn-success" id="editAddElectricBtn">增加</button><button class="btn btn-danger" id="editDelElectricBtn" style="display: none;">删除</button></div>
+
+    <!-- 其他费用记录 -->
+    <div class="section-title">其他费用记录</div>
+    <div id="editOtherTableWrapper" class="rent-table-wrapper" style="display: none;">
+      <table class="rent-table" id="editOtherTable"><thead><th>支付时间</th><th>支付金额（元）</th><th>备注</th></thead><tbody></tbody></table>
+    </div>
+    <div class="table-btn-group"><button class="btn btn-success" id="editAddOtherBtn">增加</button><button class="btn btn-danger" id="editDelOtherBtn" style="display: none;">删除</button></div>
+
+    <div class="section-title">租客备注</div>
+    <div class="form-item"><div class="form-item-row" style="display:block"><textarea id="editRemark" class="auto-resize-textarea" placeholder="可记录：租金约定、押金、水电费及其他注意事项"></textarea></div></div>
+    <div class="section-title">状态</div>
+    <div class="double-select-row"><div class="double-select-item" style="display:flex; flex-direction:column; gap:4px;"><label>租客状态</label><div class="select-button" onclick="showTenantStatusModal('edit')" id="editStatus">正常</div></div><div class="double-select-item" style="display:flex; flex-direction:column; gap:4px;"><label>合同状态</label><div class="select-button" onclick="showContractStatusModal('edit')" id="editContractStatus">未签</div></div></div>
+    <div class="form-footer"><button type="button" class="btn btn-primary" onclick="saveEditTenant()">保存修改</button><button type="button" class="btn btn-default" onclick="goBack()">返回列表</button></div>
+  </div>
+</div>
+</div>
+<script>
+// ================== 全局变量 ==================
+let tenantData = JSON.parse(localStorage.getItem('tenantData')) || [];
+let houseData = JSON.parse(localStorage.getItem('houseData')) || [];
+let currentDeleteId = null;
+let lastActivePage = 'tenant';
+let sortRule = localStorage.getItem('tenantSortRule') || 'createTimeDesc';
+let activeFilters = JSON.parse(localStorage.getItem('tenantFilters')) || [];
+let permissionEnabled = localStorage.getItem('tenantPermissionEnabled') !== null ? localStorage.getItem('tenantPermissionEnabled') === 'true' : true;
+let mergeEnabled = localStorage.getItem('tenantMergeEnabled') !== null ? localStorage.getItem('tenantMergeEnabled') === 'true' : true;
+let addTenantPending = false;  
+let preventGoBackUntil = 0;  // 临时锁：在此时间戳之前禁止 goBack 执行
+
+let depositTargetSpan = null;
+let keyTargetSpan = null;
+let keyCountTargetSpan = null;
+let tenantStatusTargetSpan = null;
+let contractTargetSpan = null;
+let roomTargetSpan = null;
+let currentRoomContext = null;
+let payPeriodTargetSpan = null;
+let payChannelTargetSpan = null;
+
+// ================== 辅助函数 ==================
+function autoResizeTextarea(textarea) {
+  if (!textarea) return;
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+function bindAutoResize(el) {
+  if (!el) return;
+  el.addEventListener('input', function() { autoResizeTextarea(this); });
+  setTimeout(() => autoResizeTextarea(el), 10);
+}
+function initAllAutoResize() {
+  const textareas = document.querySelectorAll('.auto-resize-textarea');
+  textareas.forEach(ta => bindAutoResize(ta));
+}
+
+function showPermissionModal() {
+  document.getElementById('enablePermissionCheckbox').checked = permissionEnabled;
+  document.getElementById('permissionModal').style.display = 'flex';
+}
+function closePermissionModal() { document.getElementById('permissionModal').style.display = 'none'; }
+function savePermissionSetting() {
+  permissionEnabled = document.getElementById('enablePermissionCheckbox').checked;
+  localStorage.setItem('tenantPermissionEnabled', permissionEnabled);
+  closePermissionModal();
+  renderTenant();
+}
+function canEditTenant(tenant) {
+  if (!permissionEnabled) return true;
+  const status = tenant.status;
+  if (status === '到期' || status === '提前退租') return false;
+  return true;
+}
+function canDeleteTenant(tenant) {
+  if (!permissionEnabled) return true;
+  const status = tenant.status;
+  if (status === '正常') return false;
+  if (status === '到期' || status === '提前退租') return false;
+  return true;
+}
+
+function showMergeModal() {
+  document.getElementById('enableMergeCheckbox').checked = mergeEnabled;
+  document.getElementById('mergeModal').style.display = 'flex';
+}
+function closeMergeModal() { document.getElementById('mergeModal').style.display = 'none'; }
+function saveMergeSetting() {
+  mergeEnabled = document.getElementById('enableMergeCheckbox').checked;
+  localStorage.setItem('tenantMergeEnabled', mergeEnabled);
+  closeMergeModal();
+  renderTenant();
+}
+
+function genId() { return Date.now() + '' + Math.random().toString(36).slice(2,6); }
+function saveAll() { localStorage.setItem("tenantData",JSON.stringify(tenantData)); localStorage.setItem("houseData",JSON.stringify(houseData)); }
+function getLeftInfo(expireDate) {
+  if (!expireDate || isNaN(new Date(expireDate).getTime())) return { leftDays:'异常', isExpire:false, isValid:false };
+  const now = new Date(), end = new Date(expireDate);
+  now.setHours(0,0,0,0); end.setHours(0,0,0,0);
+  const left = Math.ceil((end-now)/86400000);
+  return { leftDays: left<0?0:left, isExpire: left<=0, isValid:true };
+}
+function getLeftDaysNumber(expireDate) {
+  if (!expireDate) return Number.MAX_SAFE_INTEGER;
+  const info = getLeftInfo(expireDate);
+  return info.isValid ? info.leftDays : Number.MAX_SAFE_INTEGER;
+}
+function calculateRentMonths(startDate, endDate) {
+  if (!startDate || !endDate) return 0;
+  const start = new Date(startDate), end = new Date(endDate);
+  if (start > end) return 0;
+  let months = (end.getFullYear()-start.getFullYear())*12 + (end.getMonth()-start.getMonth());
+  if (end.getDate() < start.getDate()) months--;
+  const endMonthDays = new Date(end.getFullYear(), end.getMonth()+1, 0).getDate();
+  if (start.getDate()===1 && end.getDate()===endMonthDays) months++;
+  return months<0 ? 0 : months;
+}
+function limitYear(input) {
+  let val = input.value;
+  if (!val) return;
+  let parts = val.split('-');
+  if (parts.length===3 && parts[0].length>4) {
+    parts[0] = parts[0].slice(0,4);
+    input.value = parts.join('-');
+  }
+}
+function bindDateLimit(input) {
+  if (input && input.type==='date') input.addEventListener('input', function(){ limitYear(this); });
+}
+function updateTenantStatusByDate() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  tenantData.forEach(t => {
+    if (t.status==="已预约" && t.startDate) {
+      const start = new Date(t.startDate); start.setHours(0,0,0,0);
+      if (start <= today) t.status = "正常";
+    }
+    if (t.expireDate) {
+      const left = getLeftInfo(t.expireDate).leftDays;
+      if (left===0 && t.status!=="提前退租") t.status = "到期";
+    }
+  });
+}
+function roomHasNormal(room) { return tenantData.some(t => t.room===room && t.status==="正常"); }
+function roomHasBookedTenant(room) { return tenantData.some(t => t.room===room && t.status==="已预约"); }
+function roomHasBookedMark(room) { const house = houseData.find(h => h.room===room); return house ? house.isBooked : false; }
+function getRoomStatus(room) {
+  const hasNormal = roomHasNormal(room);
+  const hasBookedTenant = roomHasBookedTenant(room);
+  const hasBookedMark = roomHasBookedMark(room);
+  if (hasNormal && hasBookedTenant) return "已出租+已预约";
+  if (hasNormal && hasBookedMark) return "已出租+可预约";
+  if (hasNormal) return "已出租";
+  if (hasBookedTenant) return "已预约";
+  if (hasBookedMark) return "可预约";
+  return "可出租";
+}
+
+function getRoomStatusHTML(room) {
+  const status = getRoomStatus(room);
+  let tags = '';
+  if (status.includes("可出租")) tags += '<span class="tag tag-house-free">可出租</span>';
+  if (status.includes("已出租")) tags += '<span class="tag tag-house-rented">已出租</span>';
+  if (status.includes("可预约") && !status.includes("已预约")) tags += '<span class="tag tag-house-booked">可预约</span>';
+  if (status.includes("已预约")) tags += '<span class="tag tag-house-booked">已预约</span>';
+  return `<div class="status-container">${tags}</div>`;
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id==='tenant' || id==='house') {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelector(`.nav-item[data-page="${id}"]`).classList.add('active');
+    lastActivePage = id;
+  }
+  window.scrollTo(0,0);
+  document.querySelectorAll('.rent-table-wrapper').forEach(w => w.scrollLeft=0);
+  setTimeout(() => { document.querySelectorAll('.auto-resize-textarea').forEach(ta => autoResizeTextarea(ta)); }, 50);
+}
+
+// 修复 goBack：在临时锁时间内禁止返回，防止添加页面刚显示就被切回
+function goBack() {
+  if (Date.now() < preventGoBackUntil) {
+    // 锁未解除，忽略返回操作
+    return;
+  }
+  showPage(lastActivePage);
+}
+
+document.querySelectorAll(".nav-item").forEach(i => i.onclick = () => showPage(i.dataset.page));
+
+function renderTenant() {
+  updateTenantStatusByDate(); saveAll();
+  let filtered = [...tenantData];
+  if (mergeEnabled) {
+    const grouped = {};
+    filtered.forEach(t => {
+      if (!grouped[t.idCard] || new Date(t.startDate) > new Date(grouped[t.idCard].startDate)) grouped[t.idCard] = t;
+    });
+    filtered = Object.values(grouped);
+  }
+  if (activeFilters.length > 0) filtered = filtered.filter(t => activeFilters.includes(t.status));
+  filtered.sort((a,b) => {
+    if (sortRule==='createTimeDesc') return (b.createTime||0) - (a.createTime||0);
+    if (sortRule==='startDateAsc') {
+      const da = a.startDate ? new Date(a.startDate).getTime() : Number.MAX_SAFE_INTEGER;
+      const db = b.startDate ? new Date(b.startDate).getTime() : Number.MAX_SAFE_INTEGER;
+      return da - db;
+    }
+    if (sortRule==='leftDaysAsc') return getLeftDaysNumber(a.expireDate) - getLeftDaysNumber(b.expireDate);
+    return 0;
+  });
+  const tbody = document.getElementById("tenantList");
+  const emptyDiv = document.getElementById("tenantEmpty");
+  const table = document.getElementById("tenantTable");
+  if (filtered.length===0) {
+    tbody.innerHTML=''; table.style.display='none'; emptyDiv.style.display='block';
+  } else {
+    table.style.display='table'; emptyDiv.style.display='none';
+    let html = '';
+    filtered.forEach(t => {
+      const {leftDays, isValid} = getLeftInfo(t.expireDate);
+      const leftDisplay = isValid ? leftDays : '<span class="error-text">异常</span>';
+      let tenantTag = ''; if (t.status==='正常') tenantTag='tag-normal'; else if (t.status==='已预约') tenantTag='tag-book'; else if (t.status==='到期') tenantTag='tag-expire'; else if (t.status==='提前退租') tenantTag='tag-early';
+      const roomStatusHtml = getRoomStatusHTML(t.room);
+      const editDisabled = !canEditTenant(t);
+      const deleteDisabled = !canDeleteTenant(t);
+      const editBtnAttr = editDisabled ? 'disabled style="opacity:0.5;pointer-events:none;"' : '';
+      const deleteBtnAttr = deleteDisabled ? 'disabled style="opacity:0.5;pointer-events:none;"' : '';
+      html += `<tr><td>${t.name||''}</td><td>${t.room||''}</td><td>${leftDisplay}</td><td><span class="tag ${tenantTag}">${t.status}</span></td><td>${roomStatusHtml}</td><td class="action-group"><button class="btn" onclick="viewTenant('${t.id}')">查看</button><button class="btn btn-primary" onclick="editTenant('${t.id}')" ${editBtnAttr}>编辑</button><button class="btn btn-danger" onclick="showConfirm('${t.id}')" ${deleteBtnAttr}>删除</button></td></tr>`;
+    });
+    tbody.innerHTML = html;
+  }
+  document.getElementById('tenantTableBox').scrollLeft = 0;
+  updateFilterSortButtonStyle();
+}
+function updateFilterSortButtonStyle() {
+  const filterBtn = document.getElementById('filterStatusBtn');
+  if (activeFilters.length > 0) { filterBtn.classList.remove('btn-default'); filterBtn.classList.add('btn-primary'); } 
+  else { filterBtn.classList.remove('btn-primary'); filterBtn.classList.add('btn-default'); }
+  const sortBtn = document.getElementById('sortBtn');
+  if (sortRule !== 'createTimeDesc') { sortBtn.classList.remove('btn-default'); sortBtn.classList.add('btn-primary'); } 
+  else { sortBtn.classList.remove('btn-primary'); sortBtn.classList.add('btn-default'); }
+}
+
+function handleRoomAction(room) {
+  const hasBookedTenant = roomHasBookedTenant(room);
+  const hasBookedMark = roomHasBookedMark(room);
+  if (hasBookedTenant) { showMessage('该房间存在已预约的租客，请先删除对应的租客数据'); return; }
+  const house = houseData.find(h => h.room===room);
+  if (!house) return;
+  if (hasBookedMark) house.isBooked = false; else house.isBooked = true;
+  saveAll(); renderHouse(); renderTenant();
+}
+function getActionButton(room) {
+  const hasBookedTenant = roomHasBookedTenant(room);
+  const hasBookedMark = roomHasBookedMark(room);
+  if (hasBookedTenant || hasBookedMark) return `<button class="btn btn-default" onclick="handleRoomAction('${room}')">取约</button>`;
+  else return `<button class="btn btn-warning" onclick="handleRoomAction('${room}')">预约</button>`;
+}
+function renderHouse() {
+  if (houseData.length===0) {
+    document.getElementById('houseList').innerHTML='';
+    document.getElementById('houseTable').style.display='none';
+    document.getElementById('houseEmpty').style.display='block';
+  } else {
+    document.getElementById('houseTable').style.display='table';
+    document.getElementById('houseEmpty').style.display='none';
+    let html='';
+    houseData.forEach((h,i)=>{
+      const status = getRoomStatus(h.room);
+      let tagHtml='<div class="status-container">';
+      if (status.includes("可出租")) tagHtml+='<span class="tag tag-house-free">可出租</span>';
+      if (status.includes("已出租")) tagHtml+='<span class="tag tag-house-rented">已出租</span>';
+      if (status.includes("可预约") && !status.includes("已预约")) tagHtml+='<span class="tag tag-house-booked">可预约</span>';
+      if (status.includes("已预约")) tagHtml+='<span class="tag tag-house-booked">已预约</span>';
+      tagHtml+='</div>';
+      html+=`<tr data-index="${i}"><td>${h.room}</td><td>${tagHtml}</td><td><div class="action-group">${getActionButton(h.room)}</div></td></tr>`;
+    });
+    document.getElementById("houseList").innerHTML = html;
+  }
+}
+function showAddHouseModal() {
+  document.getElementById('newHouseRoom').value='';
+  document.getElementById('newHouseRoom').classList.remove('input-error');
+  document.getElementById('houseRoomError').style.visibility='hidden';
+  document.getElementById('addHouseModal').style.display='flex';
+}
+function closeAddHouseModal() { document.getElementById('addHouseModal').style.display='none'; }
+function validateHouseRoom() {
+  const room = document.getElementById('newHouseRoom').value.trim();
+  const input = document.getElementById('newHouseRoom');
+  const errorHint = document.getElementById('houseRoomError');
+  if (!room || houseData.some(h=>h.room===room)) { input.classList.add('input-error'); errorHint.style.visibility = 'visible'; } 
+  else { input.classList.remove('input-error'); errorHint.style.visibility = 'hidden'; }
+}
+function addHouse() {
+  const room = document.getElementById('newHouseRoom').value.trim();
+  const errorHint = document.getElementById('houseRoomError');
+  const input = document.getElementById('newHouseRoom');
+  if (!room || houseData.some(h=>h.room===room)) { input.classList.add('input-error'); errorHint.style.visibility='visible'; return; }
+  errorHint.style.visibility='hidden'; input.classList.remove('input-error');
+  houseData.push({ room, isBooked: false }); saveAll(); renderHouse(); closeAddHouseModal();
+}
+function resetFilter() {
+  activeFilters = [];
+  localStorage.setItem('tenantFilters', JSON.stringify(activeFilters));
+  document.getElementById('filterNormal').checked = false;
+  document.getElementById('filterBooked').checked = false;
+  document.getElementById('filterExpire').checked = false;
+  document.getElementById('filterEarly').checked = false;
+  updateFilterButtons();
+  renderTenant();
+  document.getElementById('tenantTableBox').scrollLeft=0;
+}
+function showMessage(text) { document.getElementById('messageText').innerText=text; document.getElementById('messageModal').style.display='flex'; }
+function closeMessageModal() { document.getElementById('messageModal').style.display='none'; }
+
+function updateFilterButtons() {
+  const anyChecked = document.querySelectorAll('#filterModal input[type="checkbox"]:checked').length > 0;
+  const confirmBtn = document.getElementById('filterConfirmBtn');
+  if (anyChecked) confirmBtn.style.display = 'inline-block';
+  else confirmBtn.style.display = 'none';
+}
+function showFilterModal() {
+  document.getElementById('filterNormal').checked = activeFilters.includes('正常');
+  document.getElementById('filterBooked').checked = activeFilters.includes('已预约');
+  document.getElementById('filterExpire').checked = activeFilters.includes('到期');
+  document.getElementById('filterEarly').checked = activeFilters.includes('提前退租');
+  updateFilterButtons();
+  document.getElementById('filterModal').style.display = 'flex';
+}
+function closeFilterModal() { document.getElementById('filterModal').style.display = 'none'; }
+function applyFilter() {
+  const newFilters = [];
+  if (document.getElementById('filterNormal').checked) newFilters.push('正常');
+  if (document.getElementById('filterBooked').checked) newFilters.push('已预约');
+  if (document.getElementById('filterExpire').checked) newFilters.push('到期');
+  if (document.getElementById('filterEarly').checked) newFilters.push('提前退租');
+  activeFilters = newFilters;
+  localStorage.setItem('tenantFilters', JSON.stringify(activeFilters));
+  closeFilterModal();
+  renderTenant();
+  document.getElementById('tenantTableBox').scrollLeft=0;
+}
+
+function showSortModal() {
+  document.querySelectorAll('input[name="sortRule"]').forEach(r => { if (r.value === sortRule) r.checked = true; });
+  document.getElementById('sortModal').style.display = 'flex';
+}
+function closeSortModal() { document.getElementById('sortModal').style.display = 'none'; }
+function applySort() {
+  const selected = document.querySelector('input[name="sortRule"]:checked');
+  if (selected) { sortRule = selected.value; localStorage.setItem('tenantSortRule', sortRule); renderTenant(); }
+  closeSortModal();
+}
+
+function showRoomSelectModal(context) {
+  currentRoomContext = context;
+  const container = document.getElementById('roomListContainer');
+  const fragment = document.createDocumentFragment();
+  let hasOption = false;
+  houseData.forEach(h => {
+    const status = getRoomStatus(h.room);
+    if (status === '可出租' || status === '可预约' || status === '已出租+可预约') {
+      hasOption = true;
+      const div = document.createElement('div');
+      div.className = 'filter-check-item';
+      div.innerHTML = `<input type="radio" name="roomRadio" value="${h.room}" id="room_${h.room}"><label for="room_${h.room}">${h.room} | ${status}</label>`;
+      fragment.appendChild(div);
+    }
+  });
+  container.innerHTML = '';
+  if (!hasOption) container.innerHTML = '<div style="text-align:center;color:#999;">暂无可选房间</div>';
+  else container.appendChild(fragment);
+  const currentRoom = context === 'add' ? document.getElementById('addRoomDisplay').innerText : document.getElementById('editRoomDisplay').innerText;
+  if (currentRoom && currentRoom !== '—— 请选择房间 ——') { const radio = document.querySelector(`input[name="roomRadio"][value="${currentRoom}"]`); if (radio) radio.checked = true; }
+  document.getElementById('roomSelectModal').style.display = 'flex';
+}
+function closeRoomSelectModal() { document.getElementById('roomSelectModal').style.display = 'none'; }
+function applyRoomSelect() {
+  const selected = document.querySelector('input[name="roomRadio"]:checked');
+  if (selected) {
+    const room = selected.value;
+    if (currentRoomContext === 'add') { document.getElementById('addRoomDisplay').innerText = room; updateRoomInfoFromDisplay('add'); } 
+    else { document.getElementById('editRoomDisplay').innerText = room; updateRoomInfoFromDisplay('edit'); }
+  }
+  closeRoomSelectModal();
+}
+function updateRoomInfoFromDisplay(context) {
+  const roomSpan = context === 'add' ? document.getElementById('addRoomDisplay') : document.getElementById('editRoomDisplay');
+  const room = roomSpan.innerText === '—— 请选择房间 ——' ? '' : roomSpan.innerText;
+  const roomStatusField = context === 'add' ? document.getElementById('roomStatus') : document.getElementById('editRoomStatus');
+  if (roomStatusField) roomStatusField.value = room ? getRoomStatus(room) : '';
+  if (context === 'add' && room) {
+    const statusText = getRoomStatus(room);
+    const addStatusSpan = document.getElementById('addStatus');
+    if (addStatusSpan && (statusText.includes('已出租+可预约') || statusText === '可预约')) {
+      addStatusSpan.innerText = '已预约';
+    }
+  }
+}
+
+function showDepositStatusModal(context) { const span = context === 'add' ? document.getElementById('depositStatus') : document.getElementById('editDepositStatus'); depositTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="depositRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); document.getElementById('depositStatusModal').style.display = 'flex'; }
+function closeDepositStatusModal() { document.getElementById('depositStatusModal').style.display = 'none'; }
+function applyDepositStatus() { const selected = document.querySelector('input[name="depositRadio"]:checked'); if (selected && depositTargetSpan) depositTargetSpan.innerText = selected.value; closeDepositStatusModal(); }
+function showKeyStatusModal(context) { const span = context === 'add' ? document.getElementById('keyStatusSelect') : document.getElementById('editKeyStatusSelect'); keyTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="keyRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); document.getElementById('keyStatusModal').style.display = 'flex'; }
+function closeKeyStatusModal() { document.getElementById('keyStatusModal').style.display = 'none'; }
+function applyKeyStatus() { const selected = document.querySelector('input[name="keyRadio"]:checked'); if (selected && keyTargetSpan) keyTargetSpan.innerText = selected.value; closeKeyStatusModal(); }
+function showKeyCountModal(context) { const span = context === 'add' ? document.getElementById('keyCountSelect') : document.getElementById('editKeyCountSelect'); keyCountTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="keyCountRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); document.getElementById('keyCountModal').style.display = 'flex'; }
+function closeKeyCountModal() { document.getElementById('keyCountModal').style.display = 'none'; }
+function applyKeyCount() { const selected = document.querySelector('input[name="keyCountRadio"]:checked'); if (selected && keyCountTargetSpan) keyCountTargetSpan.innerText = selected.value; closeKeyCountModal(); }
+function showTenantStatusModal(context) { const span = context === 'add' ? document.getElementById('addStatus') : document.getElementById('editStatus'); tenantStatusTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="tenantStatusRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); const earlyItem = document.getElementById('tenantEarly').closest('.filter-check-item'); if (earlyItem) { if (context === 'add') earlyItem.style.display = 'none'; else earlyItem.style.display = 'flex'; } document.getElementById('tenantStatusModal').style.display = 'flex'; }
+function closeTenantStatusModal() { const earlyItem = document.getElementById('tenantEarly').closest('.filter-check-item'); if (earlyItem) earlyItem.style.display = 'flex'; document.getElementById('tenantStatusModal').style.display = 'none'; }
+function applyTenantStatus() { const selected = document.querySelector('input[name="tenantStatusRadio"]:checked'); if (selected && tenantStatusTargetSpan) tenantStatusTargetSpan.innerText = selected.value; closeTenantStatusModal(); }
+function showContractStatusModal(context) { const span = context === 'add' ? document.getElementById('addContractStatus') : document.getElementById('editContractStatus'); contractTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="contractRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); document.getElementById('contractStatusModal').style.display = 'flex'; }
+function closeContractStatusModal() { document.getElementById('contractStatusModal').style.display = 'none'; }
+function applyContractStatus() { const selected = document.querySelector('input[name="contractRadio"]:checked'); if (selected && contractTargetSpan) contractTargetSpan.innerText = selected.value; closeContractStatusModal(); }
+function showPayPeriodModal(context) { const span = context === 'add' ? document.getElementById('addPayPeriodDisplay') : document.getElementById('editPayPeriodDisplay'); payPeriodTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="payPeriodRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); document.getElementById('payPeriodModal').style.display = 'flex'; }
+function closePayPeriodModal() { document.getElementById('payPeriodModal').style.display = 'none'; }
+function applyPayPeriod() { const selected = document.querySelector('input[name="payPeriodRadio"]:checked'); if (selected && payPeriodTargetSpan) payPeriodTargetSpan.innerText = selected.value; closePayPeriodModal(); }
+function showPayChannelModal(context) { const span = context === 'add' ? document.getElementById('addPayChannelDisplay') : document.getElementById('editPayChannelDisplay'); payChannelTargetSpan = span; const currentVal = span.innerText; document.querySelectorAll('input[name="payChannelRadio"]').forEach(r => { if (r.value === currentVal) r.checked = true; }); document.getElementById('payChannelModal').style.display = 'flex'; }
+function closePayChannelModal() { document.getElementById('payChannelModal').style.display = 'none'; }
+function applyPayChannel() { const selected = document.querySelector('input[name="payChannelRadio"]:checked'); if (selected && payChannelTargetSpan) payChannelTargetSpan.innerText = selected.value; closePayChannelModal(); }
+
+// 合租室友相关函数
+function addRoommateRowForAdd(data = { name: '', phone: '', idCard: '' }) {
+  const wrapper = document.getElementById('roommateTableWrapper');
+  const tbody = document.getElementById('addRoommatesTbody');
+  if (!tbody) return;
+  if (wrapper.style.display === 'none') wrapper.style.display = 'block';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><input type="text" class="roommate-name" placeholder="姓名" value="${data.name}"></td>
+                     <td><input type="tel" inputmode="numeric" class="roommate-phone" placeholder="手机号码" value="${data.phone}" maxlength="11" oninput="filterPhoneInput(this); checkRoommatePhone(this)"></td>
+                     <td><input type="text" inputmode="numeric" class="roommate-idcard" placeholder="身份证号码" value="${data.idCard}" maxlength="18" oninput="filterIdCardInput(this); checkRoommateIdCard(this)"></td>`;
+  tbody.appendChild(tr);
+  const table = document.getElementById('addRoommateTable');
+  if (table && table.parentElement) table.parentElement.scrollLeft = 0;
+  updateDeleteButtonVisibility();
+}
+function deleteLastRoommateRowForAdd() {
+  const tbody = document.getElementById('addRoommatesTbody');
+  const wrapper = document.getElementById('roommateTableWrapper');
+  if (!tbody || tbody.children.length === 0) return;
+  tbody.removeChild(tbody.lastElementChild);
+  if (tbody.children.length === 0) wrapper.style.display = 'none';
+  updateDeleteButtonVisibility();
+  const table = document.getElementById('addRoommateTable');
+  if (table && table.parentElement) table.parentElement.scrollLeft = 0;
+}
+function updateDeleteButtonVisibility() {
+  const tbody = document.getElementById('addRoommatesTbody');
+  const deleteBtn = document.getElementById('deleteLastRoommateBtn');
+  if (tbody && deleteBtn) deleteBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none';
+}
+function showEditRoommateTableIfNeeded() { const wrapper = document.getElementById('editRoommateWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateEditRoommateDelButton() { const tbody = document.getElementById('editRoommatesTbody'); const delBtn = document.getElementById('editDeleteRoommateBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function addEditRoommateRow(data = { name: '', phone: '', idCard: '' }) {
+  showEditRoommateTableIfNeeded();
+  const tbody = document.getElementById('editRoommatesTbody');
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><input type="text" class="roommate-name" placeholder="姓名" value="${data.name}"></td>
+                     <td><input type="tel" inputmode="numeric" class="roommate-phone" placeholder="手机号码" value="${data.phone}" maxlength="11" oninput="filterPhoneInput(this); checkRoommatePhone(this)"></td>
+                     <td><input type="text" inputmode="numeric" class="roommate-idcard" placeholder="身份证号码" value="${data.idCard}" maxlength="18" oninput="filterIdCardInput(this); checkRoommateIdCard(this)"></td>`;
+  tbody.appendChild(tr);
+  updateEditRoommateDelButton();
+  const wrapper = document.getElementById('editRoommateWrapper');
+  if (wrapper) wrapper.scrollLeft = 0;
+}
+function deleteLastEditRoommateRow() {
+  const tbody = document.getElementById('editRoommatesTbody');
+  if (!tbody || tbody.children.length === 0) return;
+  tbody.removeChild(tbody.lastElementChild);
+  if (tbody.children.length === 0) document.getElementById('editRoommateWrapper').style.display = 'none';
+  updateEditRoommateDelButton();
+  const wrapper = document.getElementById('editRoommateWrapper');
+  if (wrapper) wrapper.scrollLeft = 0;
+}
+function getRoommatesFromContainer(tbodyId) { const tbody = document.getElementById(tbodyId); if (!tbody) return []; return Array.from(tbody.querySelectorAll('tr')).map(row=>({ name: row.querySelector('.roommate-name')?.value||'', phone: row.querySelector('.roommate-phone')?.value||'', idCard: row.querySelector('.roommate-idcard')?.value||'' })).filter(r=>r.name||r.phone||r.idCard); }
+function getEditRoommates() { const tbody = document.getElementById('editRoommatesTbody'); if (!tbody) return []; return Array.from(tbody.querySelectorAll('tr')).map(row=>({ name: row.querySelector('.roommate-name')?.value||'', phone: row.querySelector('.roommate-phone')?.value||'', idCard: row.querySelector('.roommate-idcard')?.value||'' })).filter(r=>r.name||r.phone||r.idCard); }
+function checkRoommatePhone(i) { const v=i.value, reg=/^1[3-9]\d{9}$/; if(v&&!reg.test(v)) i.classList.add('input-error'); else i.classList.remove('input-error'); }
+function checkRoommateIdCard(i) { const v=i.value, reg=/^\d{17}[\dXx]$/; if(v&&!reg.test(v)) i.classList.add('input-error'); else i.classList.remove('input-error'); }
+function filterPhoneInput(input) { let v = input.value.replace(/[^\d]/g, ''); if (v.length > 11) v = v.slice(0, 11); input.value = v; }
+function filterIdCardInput(input) { let v = input.value.replace(/[^\dXx]/g, ''); v = v.toUpperCase(); if (v.length > 18) v = v.slice(0, 18); input.value = v; }
+
+// 费用记录函数（添加页）
+function showRentTableIfNeeded() { const wrapper = document.getElementById('rentTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateRentDelButton() { const tbody = document.querySelector('#rentTable tbody'); const delBtn = document.getElementById('delRentBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function addRentRow() { showRentTableIfNeeded(); const tbody = document.querySelector('#rentTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="payDate"></td><td><input type="number" class="payAmount"></td><td><input type="text" class="payRemark"></td>'; bindDateLimit(tr.querySelector('.payDate')); tbody.appendChild(tr); updateRentDelButton(); const wrapper = document.getElementById('rentTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function delRentRow() { const tbody = document.querySelector('#rentTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('rentTableWrapper').style.display = 'none'; updateRentDelButton(); const wrapper = document.getElementById('rentTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function showElecPayTableIfNeeded() { const wrapper = document.getElementById('elecPayTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateElecPayDelButton() { const tbody = document.querySelector('#elecPayTable tbody'); const delBtn = document.getElementById('delElecPayBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function addElecPayRow() { showElecPayTableIfNeeded(); const tbody = document.querySelector('#elecPayTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="elecPayDate"></td><td><input type="number" class="elecPayAmount"></td><td><input type="text" class="elecPayRemark"></td>'; bindDateLimit(tr.querySelector('.elecPayDate')); tbody.appendChild(tr); updateElecPayDelButton(); const wrapper = document.getElementById('elecPayTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function delElecPayRow() { const tbody = document.querySelector('#elecPayTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('elecPayTableWrapper').style.display = 'none'; updateElecPayDelButton(); const wrapper = document.getElementById('elecPayTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function showElectricTableIfNeeded() { const wrapper = document.getElementById('electricTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateElectricDelButton() { const tbody = document.querySelector('#electricTable tbody'); const delBtn = document.getElementById('delElectricBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function addElectricRow() { showElectricTableIfNeeded(); const tbody = document.querySelector('#electricTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="elecDate"></td><td><input type="text" inputmode="numeric" class="elecMeter" value="" onfocus="focusMeter(this)" oninput="inputMeter(this)" onblur="blurMeter(this);calcElectricFee()"></td><td><input type="number" class="elecFee" readonly></td>'; bindDateLimit(tr.querySelector('.elecDate')); tbody.appendChild(tr); calcElectricFee(); updateElectricDelButton(); const wrapper = document.getElementById('electricTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function delElectricRow() { const tbody = document.querySelector('#electricTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('electricTableWrapper').style.display = 'none'; calcElectricFee(); updateElectricDelButton(); const wrapper = document.getElementById('electricTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function calcElectricFee() { const rows = document.querySelectorAll("#electricTable tbody tr"); rows.forEach((r,i)=>{ const m=r.querySelector(".elecMeter"), f=r.querySelector(".elecFee"); if(i===0){ f.value="0.0"; f.style.background="#f5f5f5"; }else{ const prev=parseFloat(rows[i-1].querySelector(".elecMeter").value)||0.0, cur=parseFloat(m.value)||0.0; const fee=(cur-prev).toFixed(1); f.value= fee>0?fee:"0.0"; f.style.background="#fff"; } }); }
+function showOtherTableIfNeeded() { const wrapper = document.getElementById('otherTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateOtherDelButton() { const tbody = document.querySelector('#otherTable tbody'); const delBtn = document.getElementById('delOtherBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function addOtherRow() { showOtherTableIfNeeded(); const tbody = document.querySelector('#otherTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="otherDate"></td><td><input type="number" class="otherAmount"></td><td><input type="text" class="otherRemark"></td>'; bindDateLimit(tr.querySelector('.otherDate')); tbody.appendChild(tr); updateOtherDelButton(); const wrapper = document.getElementById('otherTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function delOtherRow() { const tbody = document.querySelector('#otherTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('otherTableWrapper').style.display = 'none'; updateOtherDelButton(); const wrapper = document.getElementById('otherTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+
+// 编辑页费用记录函数
+function showEditRentTableIfNeeded() { const wrapper = document.getElementById('editRentTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateEditRentDelButton() { const tbody = document.querySelector('#editRentTable tbody'); const delBtn = document.getElementById('editDelRentBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function editAddRentRow() { showEditRentTableIfNeeded(); const tbody = document.querySelector('#editRentTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="payDate"></td><td><input type="number" class="payAmount"></td><td><input type="text" class="payRemark"><td>'; bindDateLimit(tr.querySelector('.payDate')); tbody.appendChild(tr); updateEditRentDelButton(); const wrapper = document.getElementById('editRentTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function editDelRentRow() { const tbody = document.querySelector('#editRentTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('editRentTableWrapper').style.display = 'none'; updateEditRentDelButton(); const wrapper = document.getElementById('editRentTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function showEditElecPayTableIfNeeded() { const wrapper = document.getElementById('editElecPayTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateEditElecPayDelButton() { const tbody = document.querySelector('#editElecPayTable tbody'); const delBtn = document.getElementById('editDelElecPayBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function editAddElecPayRow() { showEditElecPayTableIfNeeded(); const tbody = document.querySelector('#editElecPayTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="elecPayDate"></td><td><input type="number" class="elecPayAmount"></td><td><input type="text" class="elecPayRemark"></td>'; bindDateLimit(tr.querySelector('.elecPayDate')); tbody.appendChild(tr); updateEditElecPayDelButton(); const wrapper = document.getElementById('editElecPayTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function editDelElecPayRow() { const tbody = document.querySelector('#editElecPayTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('editElecPayTableWrapper').style.display = 'none'; updateEditElecPayDelButton(); const wrapper = document.getElementById('editElecPayTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function showEditElectricTableIfNeeded() { const wrapper = document.getElementById('editElectricTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateEditElectricDelButton() { const tbody = document.querySelector('#editElectricTable tbody'); const delBtn = document.getElementById('editDelElectricBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function editAddElectricRow() { showEditElectricTableIfNeeded(); const tbody = document.querySelector('#editElectricTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="elecDate"></td><td><input type="text" inputmode="numeric" class="elecMeter" value="" onfocus="focusMeter(this)" oninput="inputMeter(this)" onblur="blurMeter(this);editCalcElectricFee()"></td><td><input type="number" class="elecFee" readonly></td>'; bindDateLimit(tr.querySelector('.elecDate')); tbody.appendChild(tr); editCalcElectricFee(); updateEditElectricDelButton(); const wrapper = document.getElementById('editElectricTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function editDelElectricRow() { const tbody = document.querySelector('#editElectricTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('editElectricTableWrapper').style.display = 'none'; editCalcElectricFee(); updateEditElectricDelButton(); const wrapper = document.getElementById('editElectricTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function editCalcElectricFee() { const rows = document.querySelectorAll("#editElectricTable tbody tr"); rows.forEach((r,i)=>{ const m=r.querySelector(".elecMeter"), f=r.querySelector(".elecFee"); if(i===0){ f.value="0.0"; f.style.background="#f5f5f5"; }else{ const prev=parseFloat(rows[i-1].querySelector(".elecMeter").value)||0.0, cur=parseFloat(m.value)||0.0; const fee=(cur-prev).toFixed(1); f.value= fee>0?fee:"0.0"; f.style.background="#fff"; } }); }
+function showEditOtherTableIfNeeded() { const wrapper = document.getElementById('editOtherTableWrapper'); if (wrapper.style.display === 'none') wrapper.style.display = 'block'; }
+function updateEditOtherDelButton() { const tbody = document.querySelector('#editOtherTable tbody'); const delBtn = document.getElementById('editDelOtherBtn'); if (tbody && delBtn) delBtn.style.display = tbody.children.length > 0 ? 'inline-block' : 'none'; }
+function editAddOtherRow() { showEditOtherTableIfNeeded(); const tbody = document.querySelector('#editOtherTable tbody'); if (!tbody) return; const tr = document.createElement('tr'); tr.innerHTML = '<td><input type="date" class="otherDate"></td><td><input type="number" class="otherAmount"></td><td><input type="text" class="otherRemark"></td>'; bindDateLimit(tr.querySelector('.otherDate')); tbody.appendChild(tr); updateEditOtherDelButton(); const wrapper = document.getElementById('editOtherTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+function editDelOtherRow() { const tbody = document.querySelector('#editOtherTable tbody'); if (!tbody || tbody.children.length === 0) return; tbody.removeChild(tbody.lastElementChild); if (tbody.children.length === 0) document.getElementById('editOtherTableWrapper').style.display = 'none'; updateEditOtherDelButton(); const wrapper = document.getElementById('editOtherTableWrapper'); if (wrapper) wrapper.scrollLeft = 0; }
+
+// 修复添加租客跳转异常: 增加事件保护 + 临时锁防止 goBack 误触发
+function goToAddTenant(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  if (addTenantPending) return;
+  addTenantPending = true;
+  
+  // 设置临时锁：800ms 内禁止任何 goBack 调用
+  preventGoBackUntil = Date.now() + 800;
+  
+  // 重置所有表单字段
+  document.getElementById("monthRent").value=''; document.getElementById("deposit").value=''; document.getElementById("startDate").value=''; document.getElementById("addExpireDate").value='';
+  document.getElementById("addPayPeriodDisplay").innerText = '月付'; document.getElementById("addPayChannelDisplay").innerText = '微信';
+  document.getElementById("addName").value=''; document.getElementById("addPhone").value=''; document.getElementById("addIdCard").value='';
+  document.getElementById("keyCountSelect").innerText = '1'; document.getElementById("keyStatusSelect").innerText = '待交接';
+  document.getElementById("tenantRemark").value=''; document.getElementById("rentMonths").value=''; document.getElementById("leftDays").value='';
+  const tbody = document.getElementById('addRoommatesTbody'); if (tbody) tbody.innerHTML = '';
+  document.getElementById('roommateTableWrapper').style.display = 'none'; updateDeleteButtonVisibility();
+  const rentTbody = document.querySelector('#rentTable tbody'); if (rentTbody) rentTbody.innerHTML = ''; document.getElementById('rentTableWrapper').style.display = 'none'; updateRentDelButton();
+  const elecTbody = document.querySelector('#elecPayTable tbody'); if (elecTbody) elecTbody.innerHTML = ''; document.getElementById('elecPayTableWrapper').style.display = 'none'; updateElecPayDelButton();
+  const electricTbody = document.querySelector('#electricTable tbody'); if (electricTbody) electricTbody.innerHTML = ''; document.getElementById('electricTableWrapper').style.display = 'none'; updateElectricDelButton();
+  const otherTbody = document.querySelector('#otherTable tbody'); if (otherTbody) otherTbody.innerHTML = ''; document.getElementById('otherTableWrapper').style.display = 'none'; updateOtherDelButton();
+  document.getElementById("addStatus").innerText="正常"; document.getElementById("addContractStatus").innerText="未签"; document.getElementById("depositStatus").innerText="未支付";
+  document.getElementById("addRoomDisplay").innerText = '—— 请选择房间 ——'; document.getElementById("roomStatus").value = '';
+  checkAddPhone(); checkAddIdCard(); calcRentInfo(); 
+  // 确保页面切换
+  showPage('addTenantPage');
+  document.querySelectorAll('#addTenantPage input[type="date"]').forEach(bindDateLimit);
+  clearAddPageErrors();
+  setTimeout(() => { const ta = document.getElementById('tenantRemark'); if(ta) autoResizeTextarea(ta); }, 100);
+  // 延迟重置标志，避免快速点击造成页面闪动；锁在稍后自动解除
+  setTimeout(() => { addTenantPending = false; }, 600);
+  // 锁在 800ms 后自动解除（不需要额外操作，时间到自然允许返回）
+}
+function clearAddPageErrors() {
+  document.querySelectorAll('#addTenantPage .input-error').forEach(el => el.classList.remove('input-error'));
+  document.getElementById('addRoomDisplay').classList.remove('input-error');
+}
+// 用户主动点击返回按钮时，先解除临时锁再执行返回
+function clearAddFormErrorsAndBack() { 
+  clearAddPageErrors(); 
+  preventGoBackUntil = 0;   // 解除锁，允许返回
+  goBack(); 
+}
+function calcRentInfo() {
+  const s = document.getElementById("startDate").value;
+  const e = document.getElementById("addExpireDate").value;
+  if (!s || !e) {
+    document.getElementById("rentMonths").value = '';
+    document.getElementById("leftDays").value = '';
+    return;
+  }
+  const left = Math.ceil((new Date(e) - new Date()) / 86400000);
+  document.getElementById("leftDays").value = left < 0 ? 0 : left;
+  document.getElementById("rentMonths").value = calculateRentMonths(s, e);
+}
+function checkIdCardBase(v,i){ const reg=/^\d{17}[\dXx]$/; if(!v){ i.classList.remove("input-error"); return true; } if(!reg.test(v)){ i.classList.add("input-error"); return false; } i.classList.remove("input-error"); return true; }
+function checkPhoneBase(v,i){ const reg=/^1[3-9]\d{9}$/; if(!v){ i.classList.remove("input-error"); return true; } if(!reg.test(v)){ i.classList.add("input-error"); return false; } i.classList.remove("input-error"); return true; }
+function checkAddIdCard(){ return checkIdCardBase(document.getElementById("addIdCard").value, document.getElementById("addIdCard")); }
+function checkAddPhone(){ return checkPhoneBase(document.getElementById("addPhone").value, document.getElementById("addPhone")); }
+function scrollToAndFocus(element, isSelectButton = false) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (!isSelectButton && element.focus) element.focus(); }
+function saveAddTenant() {
+  clearAddPageErrors();
+  const name = document.getElementById('addName').value.trim();
+  const phone = document.getElementById('addPhone').value.trim();
+  const idCard = document.getElementById('addIdCard').value.trim();
+  const room = document.getElementById('addRoomDisplay').innerText === '—— 请选择房间 ——' ? '' : document.getElementById('addRoomDisplay').innerText;
+  let errorField = null, errorIsSelect = false;
+  if (!name) { errorField = document.getElementById('addName'); errorField.classList.add('input-error'); }
+  else if (!phone) { errorField = document.getElementById('addPhone'); errorField.classList.add('input-error'); }
+  else if (!checkPhoneBase(phone, document.getElementById('addPhone'))) errorField = document.getElementById('addPhone');
+  else if (!idCard) { errorField = document.getElementById('addIdCard'); errorField.classList.add('input-error'); }
+  else if (!checkIdCardBase(idCard, document.getElementById('addIdCard'))) errorField = document.getElementById('addIdCard');
+  else if (!room) { errorField = document.getElementById('addRoomDisplay'); errorField.classList.add('input-error'); errorIsSelect = true; }
+  if (errorField) { scrollToAndFocus(errorField, errorIsSelect); showMessage('请完整填写所有必填项（姓名、手机号、身份证、房间号）'); return; }
+
+  const status = document.getElementById("addStatus").innerText;
+  const startDate = document.getElementById("startDate").value;
+  const expireDate = document.getElementById("addExpireDate").value;
+
+  if (status !== '已预约') {
+    if (!startDate) { showMessage('正常租客请填写入住日期'); scrollToAndFocus(document.getElementById('startDate'), false); return; }
+    if (!expireDate) { showMessage('正常租客请填写到期日期'); scrollToAndFocus(document.getElementById('addExpireDate'), false); return; }
+    const start = new Date(startDate), end = new Date(expireDate);
+    if (start > end) { showMessage('到期日期不能早于入住日期'); scrollToAndFocus(document.getElementById('addExpireDate'), false); return; }
+  } else {
+    if (startDate && new Date(startDate) <= new Date()) { showMessage('预约租客入住日期必须晚于今天'); scrollToAndFocus(document.getElementById('startDate'), false); return; }
+  }
+
+  const existingNormal = tenantData.find(t=>t.room===room && t.status==="正常");
+  const existingBooked = tenantData.find(t=>t.room===room && t.status==="已预约");
+  const house = houseData.find(h=>h.room===room);
+  if (existingNormal && status!=="已预约") { showMessage("该房间已有正常租客，只能添加预约租客"); return; }
+  if (status==="已预约") { if (existingNormal && !house?.isBooked) { showMessage("该房间虽已出租但未标记可预约，无法添加预约"); return; } if (existingBooked) { showMessage("该房间已有预约租客，不可重复预约"); return; } }
+  if (existingBooked && !existingNormal && status!=="已预约") { showMessage("该房间已有预约租客，无法添加其他类型租客"); return; }
+
+  const rentList=[...document.querySelectorAll("#rentTable tbody tr")].map(r=>({payDate:r.querySelector(".payDate")?.value||'',payAmount:r.querySelector(".payAmount")?.value||'',payRemark:r.querySelector(".payRemark")?.value||''}));
+  const elecPayList=[...document.querySelectorAll("#elecPayTable tbody tr")].map(r=>({payDate:r.querySelector(".elecPayDate")?.value||'',payAmount:r.querySelector(".elecPayAmount")?.value||'',payRemark:r.querySelector(".elecPayRemark")?.value||''}));
+  const electricList=[...document.querySelectorAll("#electricTable tbody tr")].map(r=>({elecDate:r.querySelector(".elecDate")?.value||'',elecMeter:r.querySelector(".elecMeter")?.value||'',elecFee:r.querySelector(".elecFee")?.value||''}));
+  const otherList=[...document.querySelectorAll("#otherTable tbody tr")].map(r=>({payDate:r.querySelector(".otherDate")?.value||'',payAmount:r.querySelector(".otherAmount")?.value||'',payRemark:r.querySelector(".otherRemark")?.value||''}));
+  const roommates = getRoommatesFromContainer('addRoommatesTbody');
+
+  tenantData.push({
+    id:genId(), name, room, idCard, phone, expireDate: expireDate || '', status,
+    contractStatus: document.getElementById("addContractStatus").innerText,
+    startDate: startDate || '', monthRent: document.getElementById("monthRent").value,
+    deposit: document.getElementById("deposit").value, depositStatus: document.getElementById("depositStatus").innerText,
+    payPeriod: document.getElementById("addPayPeriodDisplay").innerText,
+    payChannel: document.getElementById("addPayChannelDisplay").innerText,
+    keyCount: document.getElementById("keyCountSelect").innerText,
+    keyStatus: document.getElementById("keyStatusSelect").innerText,
+    remark: document.getElementById("tenantRemark").value,
+    rentList, elecPayList, electricList, otherList, roommates, createTime: Date.now()
+  });
+  if (house) house.isBooked = false;
+  saveAll(); renderTenant(); renderHouse(); 
+  // 保存后解除锁并返回
+  preventGoBackUntil = 0;
+  goBack();
+}
+
+// 重置详情页面所有滚动容器的位置
+function resetDetailScrollPositions() {
+  const containers = ['#viewRoommatesContainer', '#viewRentTableWrapper', '#viewElecPayTableWrapper', '#viewElectricTableWrapper', '#viewOtherTableWrapper'];
+  containers.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) {
+      el.scrollLeft = 0;
+      el.scrollTop = 0;
+    }
+  });
+  const roommateContainer = document.getElementById('viewRoommatesContainer');
+  if (roommateContainer) {
+    roommateContainer.scrollLeft = 0;
+    roommateContainer.scrollTop = 0;
+  }
+}
+// 查看租客
+function viewTenant(id) {
+  const cur = tenantData.find(x=>x.id===id); if (!cur) return;
+  const records = tenantData.filter(t=>t.idCard===cur.idCard).sort((a,b)=>new Date(b.startDate)-new Date(a.startDate));
+  const tabs = document.getElementById('historyTabs');
+  if (records.length<=1) tabs.style.display='none';
+  else { tabs.style.display='flex'; tabs.innerHTML = records.map((r,i)=>`<div class="history-tab ${r.id===cur.id?'active':''}" data-record-id="${r.id}">${i===0?'当前':`历史${String(i).padStart(2,'0')}`}</div>`).join(''); document.querySelectorAll('.history-tab').forEach(t=>t.addEventListener('click',function(){ const rid=this.dataset.recordId, rec=tenantData.find(t=>t.id===rid); if(rec){ document.querySelectorAll('.history-tab').forEach(tt=>tt.classList.remove('active')); this.classList.add('active'); fillTenantDetail(rec); } })); }
+  fillTenantDetail(cur);
+  resetDetailScrollPositions();
+  setTimeout(() => {
+    resetDetailScrollPositions();
+  }, 30);
+  showPage('viewTenantPage');
+}
+function fillTenantDetail(t) {
+  const {leftDays,isValid}=getLeftInfo(t.expireDate); const months=calculateRentMonths(t.startDate,t.expireDate);
+  document.getElementById('viewName').value=t.name||''; document.getElementById('viewRoom').value=t.room||''; document.getElementById('viewIdCard').value=t.idCard||''; document.getElementById('viewPhone').value=t.phone||''; document.getElementById('viewStartDate').value=t.startDate||''; document.getElementById('viewExpireDate').value=t.expireDate||''; document.getElementById('viewRentMonths').value=months; document.getElementById('viewLeftDays').value=isValid?leftDays:'异常'; document.getElementById('viewLeftDays').classList.toggle('error-text',!isValid); document.getElementById('viewMonthRent').value=t.monthRent||''; document.getElementById('viewDeposit').value=t.deposit||''; document.getElementById('viewDepositStatus').innerText = t.depositStatus || '已退回'; document.getElementById('viewPayPeriod').innerText = t.payPeriod || '月付'; document.getElementById('viewPayChannel').innerText = t.payChannel || '微信'; document.getElementById('viewKeyCount').innerText = t.keyCount || '1'; document.getElementById('viewKeyStatus').innerText = t.keyStatus || '已归还'; document.getElementById('viewStatus').innerText = t.status||''; document.getElementById('viewContractStatus').innerText = t.contractStatus || '未签'; document.getElementById('viewRoomStatus').value=getRoomStatus(t.room);
+  const con=document.getElementById('viewRoommatesContainer'); con.innerHTML='';
+  if (t.roommates && t.roommates.length) {
+    const table=document.createElement('table'); table.className='roommate-table'; table.innerHTML='<thead><tr><th>姓名</th><th>手机号码</th><th>身份证号码</th></tr></thead><tbody>'+ t.roommates.map(r=>`<tr><td><input type="text" readonly value="${r.name||''}"></td><td><input type="text" readonly value="${r.phone||''}"></td><td><input type="text" readonly value="${r.idCard||''}"></td></tr>`).join('')+'</tbody>';
+    con.appendChild(table);
+  } else con.innerHTML='<div class="empty-state" style="padding:20px;">暂无合租室友</div>';
+  const rentTbody = document.querySelector('#viewRentTable tbody'); const rentEmpty = document.getElementById('viewRentEmpty'); const rentWrapper = document.getElementById('viewRentTableWrapper');
+  if (t.rentList && t.rentList.length) { rentTbody.innerHTML = ''; t.rentList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" readonly value="${item.payDate||''}"></td><td><input type="number" readonly value="${item.payAmount||''}"></td><td><input type="text" readonly value="${item.payRemark||''}"></td>`; rentTbody.appendChild(tr); }); rentWrapper.querySelector('table').style.display = 'table'; rentEmpty.style.display = 'none'; } else { rentWrapper.querySelector('table').style.display = 'none'; rentEmpty.style.display = 'block'; }
+  const elecTbody = document.querySelector('#viewElecPayTable tbody'); const elecEmpty = document.getElementById('viewElecPayEmpty'); const elecWrapper = document.getElementById('viewElecPayTableWrapper');
+  if (t.elecPayList && t.elecPayList.length) { elecTbody.innerHTML = ''; t.elecPayList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" readonly value="${item.payDate||''}"></td><td><input type="number" readonly value="${item.payAmount||''}"></td><td><input type="text" readonly value="${item.payRemark||''}"></td>`; elecTbody.appendChild(tr); }); elecWrapper.querySelector('table').style.display = 'table'; elecEmpty.style.display = 'none'; } else { elecWrapper.querySelector('table').style.display = 'none'; elecEmpty.style.display = 'block'; }
+  const electricTbody = document.querySelector('#viewElectricTable tbody'); const electricEmpty = document.getElementById('viewElectricEmpty'); const electricWrapper = document.getElementById('viewElectricTableWrapper');
+  if (t.electricList && t.electricList.length) { electricTbody.innerHTML = ''; t.electricList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" readonly value="${item.elecDate||''}"></td><td><input type="text" readonly value="${item.elecMeter||''}"></td><td><input type="number" readonly value="${item.elecFee||''}"></td>`; electricTbody.appendChild(tr); }); electricWrapper.querySelector('table').style.display = 'table'; electricEmpty.style.display = 'none'; } else { electricWrapper.querySelector('table').style.display = 'none'; electricEmpty.style.display = 'block'; }
+  const otherTbody = document.querySelector('#viewOtherTable tbody'); const otherEmpty = document.getElementById('viewOtherEmpty'); const otherWrapper = document.getElementById('viewOtherTableWrapper');
+  if (t.otherList && t.otherList.length) { otherTbody.innerHTML = ''; t.otherList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" readonly value="${item.payDate||''}"></td><td><input type="number" readonly value="${item.payAmount||''}"></td><td><input type="text" readonly value="${item.payRemark||''}"></td>`; otherTbody.appendChild(tr); }); otherWrapper.querySelector('table').style.display = 'table'; otherEmpty.style.display = 'none'; } else { otherWrapper.querySelector('table').style.display = 'none'; otherEmpty.style.display = 'block'; }
+  const remarkTextarea = document.getElementById('viewRemark'); const remarkEmpty = document.getElementById('viewRemarkEmpty');
+  if (t.remark && t.remark.trim()) { remarkTextarea.value = t.remark; remarkTextarea.style.display = 'block'; remarkEmpty.style.display = 'none'; autoResizeTextarea(remarkTextarea); } else { remarkTextarea.style.display = 'none'; remarkEmpty.style.display = 'block'; }
+}
+
+// 编辑租客
+function editTenant(id) {
+  const t = tenantData.find(x=>x.id===id); if (!t) return;
+  if (!canEditTenant(t)) { showMessage(`租客状态为“${t.status}”，根据权限规则不可编辑`); return; }
+  document.getElementById('editRoomDisplay').innerText = t.room||''; document.getElementById('editMonthRent').value = t.monthRent||''; document.getElementById('editDeposit').value = t.deposit||''; document.getElementById('editDepositStatus').innerText = t.depositStatus || '已退回'; document.getElementById('editStartDate').value = t.startDate||''; document.getElementById('editExpireDate').value = t.expireDate||''; document.getElementById('editPayPeriodDisplay').innerText = t.payPeriod || '月付'; document.getElementById('editPayChannelDisplay').innerText = t.payChannel || '微信'; document.getElementById('editName').value = t.name||''; document.getElementById('editPhone').value = t.phone||''; document.getElementById('editIdCard').value = t.idCard||''; document.getElementById('editKeyCountSelect').innerText = t.keyCount || '1'; document.getElementById('editKeyStatusSelect').innerText = t.keyStatus || '待交接'; document.getElementById('editRemark').value = t.remark||''; let statusToSet = t.status||'正常'; if (statusToSet==='到期') statusToSet='正常'; document.getElementById('editStatus').innerText = statusToSet; document.getElementById('editContractStatus').innerText = t.contractStatus || '未签'; document.getElementById('editRoomStatus').value = getRoomStatus(t.room);
+  const editRoommateTbody = document.getElementById('editRoommatesTbody'); editRoommateTbody.innerHTML = '';
+  if (t.roommates && t.roommates.length) { document.getElementById('editRoommateWrapper').style.display = 'block'; t.roommates.forEach(r => addEditRoommateRow(r)); } else { document.getElementById('editRoommateWrapper').style.display = 'none'; updateEditRoommateDelButton(); }
+  const editRentTbody = document.querySelector('#editRentTable tbody'); if (editRentTbody) editRentTbody.innerHTML = ''; document.getElementById('editRentTableWrapper').style.display = 'none'; updateEditRentDelButton(); if (t.rentList && t.rentList.length) { document.getElementById('editRentTableWrapper').style.display = 'block'; t.rentList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" class="payDate" value="${item.payDate||''}"></td><td><input type="number" class="payAmount" value="${item.payAmount||''}"></td><td><input type="text" class="payRemark" value="${item.payRemark||''}"></td>`; bindDateLimit(tr.querySelector('.payDate')); editRentTbody.appendChild(tr); }); updateEditRentDelButton(); }
+  const editElecTbody = document.querySelector('#editElecPayTable tbody'); if (editElecTbody) editElecTbody.innerHTML = ''; document.getElementById('editElecPayTableWrapper').style.display = 'none'; updateEditElecPayDelButton(); if (t.elecPayList && t.elecPayList.length) { document.getElementById('editElecPayTableWrapper').style.display = 'block'; t.elecPayList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" class="elecPayDate" value="${item.payDate||''}"></td><td><input type="number" class="elecPayAmount" value="${item.payAmount||''}"></td><td><input type="text" class="elecPayRemark" value="${item.payRemark||''}"></td>`; bindDateLimit(tr.querySelector('.elecPayDate')); editElecTbody.appendChild(tr); }); updateEditElecPayDelButton(); }
+  const editElectricTbody = document.querySelector('#editElectricTable tbody'); if (editElectricTbody) editElectricTbody.innerHTML = ''; document.getElementById('editElectricTableWrapper').style.display = 'none'; updateEditElectricDelButton(); if (t.electricList && t.electricList.length) { document.getElementById('editElectricTableWrapper').style.display = 'block'; t.electricList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" class="elecDate" value="${item.elecDate||''}"></td><td><input type="text" inputmode="numeric" class="elecMeter" value="${item.elecMeter||''}" onfocus="focusMeter(this)" oninput="inputMeter(this)" onblur="blurMeter(this);editCalcElectricFee()"></td><td><input type="number" class="elecFee" value="${item.elecFee||'0.0'}" readonly></td>`; bindDateLimit(tr.querySelector('.elecDate')); editElectricTbody.appendChild(tr); }); editCalcElectricFee(); updateEditElectricDelButton(); }
+  const editOtherTbody = document.querySelector('#editOtherTable tbody'); if (editOtherTbody) editOtherTbody.innerHTML = ''; document.getElementById('editOtherTableWrapper').style.display = 'none'; updateEditOtherDelButton(); if (t.otherList && t.otherList.length) { document.getElementById('editOtherTableWrapper').style.display = 'block'; t.otherList.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="date" class="otherDate" value="${item.payDate||''}"></td><td><input type="number" class="otherAmount" value="${item.payAmount||''}"></td><td><input type="text" class="otherRemark" value="${item.payRemark||''}"></td>`; bindDateLimit(tr.querySelector('.otherDate')); editOtherTbody.appendChild(tr); }); updateEditOtherDelButton(); }
+  editCalcRentInfo(); checkEditPhone(); checkEditIdCard(); document.getElementById('editTenantPage').dataset.editId = id; showPage('editTenantPage'); setTimeout(() => { const ta = document.getElementById('editRemark'); if(ta) autoResizeTextarea(ta); }, 30);
+}
+function editCalcRentInfo() { const s = document.getElementById("editStartDate").value, e = document.getElementById("editExpireDate").value; if (!s || !e) { document.getElementById("editRentMonths").value = ''; document.getElementById("editLeftDays").value = ''; return; } document.getElementById("editLeftDays").value = Math.ceil((new Date(e) - new Date()) / 86400000) < 0 ? 0 : Math.ceil((new Date(e) - new Date()) / 86400000); document.getElementById("editRentMonths").value = calculateRentMonths(s, e); }
+function checkEditIdCard() { checkIdCardBase(document.getElementById("editIdCard").value, document.getElementById("editIdCard")); }
+function checkEditPhone() { checkPhoneBase(document.getElementById("editPhone").value, document.getElementById("editPhone")); }
+function saveEditTenant() {
+  const id = document.getElementById('editTenantPage').dataset.editId; if (!id) return;
+  const original = tenantData.find(x => x.id === id); if (original && !canEditTenant(original)) { showMessage(`租客状态为“${original.status}”，不可编辑修改`); goBack(); return; }
+  const name = document.getElementById("editName").value, room = document.getElementById("editRoomDisplay").innerText === '—— 请选择房间 ——' ? '' : document.getElementById("editRoomDisplay").innerText, idCard = document.getElementById("editIdCard").value, phone = document.getElementById("editPhone").value, expire = document.getElementById("editExpireDate").value, selectedStatus = document.getElementById("editStatus").innerText, contractStatus = document.getElementById("editContractStatus").innerText, depositStatus = document.getElementById("editDepositStatus").innerText, keyCount = document.getElementById("editKeyCountSelect").innerText, keyStatus = document.getElementById("editKeyStatusSelect").innerText, payPeriod = document.getElementById("editPayPeriodDisplay").innerText, payChannel = document.getElementById("editPayChannelDisplay").innerText;
+  if (!checkIdCardBase(idCard, document.getElementById("editIdCard")) || !checkPhoneBase(phone, document.getElementById("editPhone"))) { showMessage("身份证或手机号格式错误"); return; }
+  if (!room) { showMessage("房间号异常"); return; }
+  const index = tenantData.findIndex(x => x.id === id); if (index === -1) return;
+  let finalStatus = selectedStatus; if (selectedStatus === "正常") { const sd = document.getElementById("editStartDate").value, ed = document.getElementById("editExpireDate").value, today = new Date(); today.setHours(0, 0, 0, 0); if (ed) { const left = getLeftInfo(ed).leftDays; if (left === 0) finalStatus = "到期"; } }
+  const rentList = [...document.querySelectorAll("#editRentTable tbody tr")].map(r => ({ payDate: r.querySelector(".payDate")?.value || '', payAmount: r.querySelector(".payAmount")?.value || '', payRemark: r.querySelector(".payRemark")?.value || '' }));
+  const elecPayList = [...document.querySelectorAll("#editElecPayTable tbody tr")].map(r => ({ payDate: r.querySelector(".elecPayDate")?.value || '', payAmount: r.querySelector(".elecPayAmount")?.value || '', payRemark: r.querySelector(".elecPayRemark")?.value || '' }));
+  const electricList = [...document.querySelectorAll("#editElectricTable tbody tr")].map(r => ({ elecDate: r.querySelector(".elecDate")?.value || '', elecMeter: r.querySelector(".elecMeter")?.value || '', elecFee: r.querySelector(".elecFee")?.value || '' }));
+  const otherList = [...document.querySelectorAll("#editOtherTable tbody tr")].map(r => ({ payDate: r.querySelector(".otherDate")?.value || '', payAmount: r.querySelector(".otherAmount")?.value || '', payRemark: r.querySelector(".otherRemark")?.value || '' }));
+  const roommates = getEditRoommates(); const originalCreateTime = tenantData[index].createTime;
+  tenantData[index] = { ...tenantData[index], name, room, idCard, phone, expireDate: expire, status: finalStatus, contractStatus, startDate: document.getElementById("editStartDate").value, monthRent: document.getElementById("editMonthRent").value, deposit: document.getElementById("editDeposit").value, depositStatus, payPeriod, payChannel, keyCount, keyStatus, remark: document.getElementById("editRemark").value, rentList, elecPayList, electricList, otherList, roommates, createTime: originalCreateTime };
+  saveAll(); renderTenant(); renderHouse(); goBack();
+}
+
+// 删除确认
+function showConfirm(id) { currentDeleteId = id; document.getElementById("confirmModal").style.display = "flex"; }
+function closeConfirm() { currentDeleteId = null; document.getElementById("confirmModal").style.display = "none"; }
+function realDelete() { if (!currentDeleteId) return; const t = tenantData.find(x => x.id === currentDeleteId); if (t && !canDeleteTenant(t)) { showMessage(`租客状态为“${t.status}”，根据权限规则不可删除`); closeConfirm(); currentDeleteId = null; return; } if (t) { tenantData = tenantData.filter(x => x.id !== currentDeleteId); saveAll(); renderTenant(); renderHouse(); } closeConfirm(); }
+
+// 导入导出
+function exportData() {
+  const exportObj = {
+    tenant: tenantData,
+    house: houseData,
+    settings: {
+      sortRule: sortRule,
+      activeFilters: activeFilters,
+      mergeEnabled: mergeEnabled,
+      permissionEnabled: permissionEnabled
+    },
+    version: "2.0"
+  };
+  const now = new Date();
+  const timeStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+  const blob = new Blob([JSON.stringify(exportObj)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "租房数据_" + timeStr + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importData() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (imported.tenant) tenantData = imported.tenant;
+        if (imported.house) houseData = imported.house;
+        if (imported.settings) {
+          if (imported.settings.sortRule !== undefined) sortRule = imported.settings.sortRule;
+          if (imported.settings.activeFilters !== undefined) activeFilters = imported.settings.activeFilters;
+          if (imported.settings.mergeEnabled !== undefined) mergeEnabled = imported.settings.mergeEnabled;
+          if (imported.settings.permissionEnabled !== undefined) permissionEnabled = imported.settings.permissionEnabled;
+          localStorage.setItem('tenantSortRule', sortRule);
+          localStorage.setItem('tenantFilters', JSON.stringify(activeFilters));
+          localStorage.setItem('tenantMergeEnabled', mergeEnabled);
+          localStorage.setItem('tenantPermissionEnabled', permissionEnabled);
+        }
+        saveAll();
+        renderTenant();
+        renderHouse();
+        updateFilterSortButtonStyle();
+        showMessage("导入成功，已恢复数据及排序/筛选/合并/权限状态");
+      } catch(err) {
+        showMessage("导入失败，文件格式错误");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// 房源排序拖拽
+let sortableInstance = null;
+function showSortHouseModal() { 
+  const container = document.getElementById('sortableRoomList'); 
+  container.innerHTML = ''; 
+  houseData.forEach((house, idx) => { 
+    const li = document.createElement('li'); 
+    li.className = 'sortable-item'; 
+    li.style.cssText = 'padding: 12px; margin: 6px 0; background: #f9f8f5; border: 1px solid #e2dcd2; border-radius: 8px; cursor: grab;'; 
+    li.innerText = house.room; 
+    li.setAttribute('data-room', house.room); 
+    container.appendChild(li); 
+  }); 
+  document.getElementById('sortHouseModal').style.display = 'flex'; 
+  if (typeof Sortable !== 'undefined') { 
+    sortableInstance = new Sortable(container, { 
+      animation: 180, 
+      handle: '.sortable-item', 
+      ghostClass: 'sortable-ghost-hidden', 
+      dragClass: 'sortable-drag-custom', 
+      forceFallback: true, 
+      fallbackClass: 'sortable-fallback-custom', 
+      fallbackOnBody: true, 
+      setData: function (dataTransfer) { dataTransfer.setDragImage && dataTransfer.setDragImage(document.createElement('div'), 0, 0); } 
+    }); 
+  } else {
+    console.warn("Sortable库未加载，拖拽排序不可用");
+  }
+}
+function closeSortHouseModal() { 
+  if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; } 
+  document.getElementById('sortHouseModal').style.display = 'none'; 
+}
+function saveHouseOrder() { 
+  const items = document.querySelectorAll('#sortableRoomList .sortable-item'); 
+  const newOrder = Array.from(items).map(li => li.getAttribute('data-room')); 
+  const newHouseData = []; 
+  newOrder.forEach(room => { 
+    const found = houseData.find(h => h.room === room); 
+    if (found) newHouseData.push(found); 
+  }); 
+  houseData.forEach(h => { 
+    if (!newOrder.includes(h.room)) newHouseData.push(h); 
+  }); 
+  houseData = newHouseData; 
+  saveAll(); 
+  renderHouse(); 
+  closeSortHouseModal(); 
+}
+
+// 批量删除弹窗
+function batchDelete() { 
+  const container = document.getElementById('deleteHouseList'); 
+  const errorDiv = document.getElementById('deleteHouseErrorMsg'); 
+  if (errorDiv) { errorDiv.innerText = ''; errorDiv.classList.remove('visible'); } 
+  container.innerHTML = ''; 
+  let anyRentable = false; 
+  houseData.forEach(house => { 
+    const status = getRoomStatus(house.room); 
+    const isRentable = (status === '可出租'); 
+    if (isRentable) anyRentable = true; 
+    const div = document.createElement('div'); 
+    div.className = 'filter-check-item'; 
+    div.style.display = 'flex'; 
+    div.style.justifyContent = 'space-between'; 
+    div.style.alignItems = 'center'; 
+    div.style.marginBottom = '12px'; 
+    div.style.padding = '8px 0'; 
+    div.style.borderBottom = '1px solid #F0EEEA'; 
+    const leftPart = document.createElement('div'); 
+    leftPart.style.display = 'flex'; 
+    leftPart.style.alignItems = 'center'; 
+    leftPart.style.gap = '10px'; 
+    const cb = document.createElement('input'); 
+    cb.type = 'checkbox'; 
+    cb.value = house.room; 
+    cb.className = 'delete-house-cb'; 
+    if (!isRentable) { cb.disabled = true; cb.style.cursor = 'not-allowed'; } 
+    const roomSpan = document.createElement('span'); 
+    roomSpan.innerText = house.room; 
+    roomSpan.style.fontWeight = '500'; 
+    leftPart.appendChild(cb); 
+    leftPart.appendChild(roomSpan); 
+    let tagSpan = document.createElement('span'); 
+    tagSpan.className = 'tag'; 
+    if (status === '可出租') { tagSpan.classList.add('tag-house-free'); tagSpan.innerText = '可出租'; } 
+    else if (status === '已出租') { tagSpan.classList.add('tag-house-rented'); tagSpan.innerText = '已出租'; } 
+    else if (status === '已预约') { tagSpan.classList.add('tag-house-booked'); tagSpan.innerText = '已预约'; } 
+    else if (status === '可预约') { tagSpan.classList.add('tag-house-booked'); tagSpan.innerText = '可预约'; } 
+    else { tagSpan.classList.add('tag-house-rented'); tagSpan.innerText = status; } 
+    div.appendChild(leftPart); 
+    div.appendChild(tagSpan); 
+    container.appendChild(div); 
+  }); 
+  if (!anyRentable) { 
+    if (errorDiv) { errorDiv.innerText = '当前没有可删除的房间'; errorDiv.classList.add('visible'); } 
+    document.getElementById('confirmDeleteHousesBtn').style.display = 'none'; 
+  } else { 
+    document.getElementById('confirmDeleteHousesBtn').style.display = 'block'; 
+  } 
+  document.getElementById('deleteHouseModal').style.display = 'flex'; 
+}
+function closeDeleteHouseModal() { document.getElementById('deleteHouseModal').style.display = 'none'; }
+document.getElementById('confirmDeleteHousesBtn').addEventListener('click', function () { 
+  const selected = Array.from(document.querySelectorAll('.delete-house-cb:checked')).map(cb => cb.value); 
+  const errorDiv = document.getElementById('deleteHouseErrorMsg'); 
+  if (selected.length === 0) { 
+    if (errorDiv) { errorDiv.innerText = '请至少选择一个可出租的房源进行删除'; errorDiv.classList.add('visible'); } 
+    return; 
+  } 
+  houseData = houseData.filter(house => !selected.includes(house.room)); 
+  saveAll(); 
+  renderHouse(); 
+  closeDeleteHouseModal(); 
+});
+
+// ========== 长按房源排序 ==========
+function bindLongPressOnHouseRows() {
+  const tableBody = document.getElementById('houseList');
+  if (!tableBody) return;
+  let pressTimer = null;
+  const startLongPress = (e) => {
+    const target = e.target.closest('tr');
+    if (!target) return;
+    if (e.target.closest('.action-group') || e.target.closest('button')) return;
+    e.preventDefault();
+    pressTimer = setTimeout(() => {
+      showSortHouseModal();
+      pressTimer = null;
+    }, 500);
+  };
+  const cancelLongPress = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  };
+  tableBody.addEventListener('touchstart', startLongPress, { passive: false });
+  tableBody.addEventListener('touchend', cancelLongPress);
+  tableBody.addEventListener('touchmove', cancelLongPress);
+  tableBody.addEventListener('touchcancel', cancelLongPress);
+  tableBody.addEventListener('mousedown', startLongPress);
+  tableBody.addEventListener('mouseup', cancelLongPress);
+  tableBody.addEventListener('mousemove', cancelLongPress);
+}
+
+// 电表辅助函数
+function focusMeter(input) {
+    if (!input) return;
+    let val = input.value;
+    if (val === '') return;
+    let num = parseFloat(val);
+    if (isNaN(num)) {
+        input.value = '';
+        return;
+    }
+    let rawInt = Math.round(num * 10);
+    input.value = rawInt.toString();
+}
+function inputMeter(input) {
+    let v = input.value;
+    v = v.replace(/[^\d]/g, '');
+    if (v.length > 6) v = v.slice(0, 6);
+    input.value = v;
+}
+function blurMeter(input) {
+    let v = input.value.trim();
+    if (v === '') {
+        input.value = '';
+        if (document.getElementById('editElectricTable')) editCalcElectricFee(); else calcElectricFee();
+        return;
+    }
+    v = v.replace(/[^\d]/g, '');
+    if (v === '') {
+        input.value = '';
+        if (document.getElementById('editElectricTable')) editCalcElectricFee(); else calcElectricFee();
+        return;
+    }
+    if (v.length > 6) v = v.slice(0, 6);
+    let intPart = v.slice(0, -1);
+    let decimalPart = v.slice(-1);
+    intPart = intPart.padStart(5, '0');
+    let formatted = `${intPart}.${decimalPart}`;
+    input.value = formatted;
+    if (document.getElementById('editElectricTable')) editCalcElectricFee(); else calcElectricFee();
+}
+
+// 动态修改按钮样式
+function swapButtonColors() {
+  const importBtn = document.getElementById('importBtn');
+  const addTenantBtn = document.getElementById('addTenantBtn');
+  if (importBtn && addTenantBtn) {
+    importBtn.classList.remove('btn-success');
+    importBtn.classList.add('btn-primary');
+    addTenantBtn.classList.remove('btn-primary');
+    addTenantBtn.classList.add('btn-success');
+  }
+}
+
+// 初始化渲染和事件绑定
+renderTenant(); renderHouse();
+document.querySelectorAll('input[type="date"]').forEach(bindDateLimit);
+updateFilterSortButtonStyle();
+document.getElementById('mergeSettingsBtn').addEventListener('click', showMergeModal);
+document.getElementById('permissionBtn').addEventListener('click', showPermissionModal);
+document.getElementById('exportBtn').addEventListener('click', exportData);
+document.getElementById('importBtn').addEventListener('click', importData);
+document.getElementById('addTenantBtn').addEventListener('click', goToAddTenant);
+const showAddRoommateBtn = document.getElementById('showAddRoommateBtn'); 
+const deleteLastRoommateBtn = document.getElementById('deleteLastRoommateBtn');
+if (showAddRoommateBtn) showAddRoommateBtn.addEventListener('click', function () { addRoommateRowForAdd({ name: '', phone: '', idCard: '' }); });
+if (deleteLastRoommateBtn) deleteLastRoommateBtn.addEventListener('click', function () { deleteLastRoommateRowForAdd(); });
+document.getElementById('addRentBtn').addEventListener('click', addRentRow); document.getElementById('delRentBtn').addEventListener('click', delRentRow);
+document.getElementById('addElecPayBtn').addEventListener('click', addElecPayRow); document.getElementById('delElecPayBtn').addEventListener('click', delElecPayRow);
+document.getElementById('addElectricBtn').addEventListener('click', addElectricRow); document.getElementById('delElectricBtn').addEventListener('click', delElectricRow);
+document.getElementById('addOtherBtn').addEventListener('click', addOtherRow); document.getElementById('delOtherBtn').addEventListener('click', delOtherRow);
+document.getElementById('editAddRoommateBtn').addEventListener('click', function () { addEditRoommateRow({ name: '', phone: '', idCard: '' }); });
+document.getElementById('editDeleteRoommateBtn').addEventListener('click', function () { deleteLastEditRoommateRow(); });
+document.getElementById('editAddRentBtn').addEventListener('click', editAddRentRow); document.getElementById('editDelRentBtn').addEventListener('click', editDelRentRow);
+document.getElementById('editAddElecPayBtn').addEventListener('click', editAddElecPayRow); document.getElementById('editDelElecPayBtn').addEventListener('click', editDelElecPayRow);
+document.getElementById('editAddElectricBtn').addEventListener('click', editAddElectricRow); document.getElementById('editDelElectricBtn').addEventListener('click', editDelElectricRow);
+document.getElementById('editAddOtherBtn').addEventListener('click', editAddOtherRow); document.getElementById('editDelOtherBtn').addEventListener('click', editDelOtherRow);
+bindLongPressOnHouseRows();
+initAllAutoResize();
+swapButtonColors();
+document.getElementById('addName').addEventListener('input', function() { this.classList.remove('input-error'); });
+
+// 全局禁止右键菜单
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
+document.body.style.webkitTouchCallout = 'none';
+</script>
+</body>
 </html>
